@@ -199,5 +199,6 @@ export class GridLineParser {
   }
   parse() {
     const {lines} = this.parseCondition(_ => true, ['minmax', 'fit-content', 'repeat']);
+    return lines;
   }
 }
