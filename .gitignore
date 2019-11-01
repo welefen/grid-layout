@@ -61,3 +61,7 @@ typings/
 .next
 
 lib/
+
+test/*.js
+
+src/*.js
