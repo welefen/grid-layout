@@ -1,0 +1,26 @@
+{
+  "name": "grid-layout",
+  "version": "1.0.0",
+  "description": "CSS Grid Layout, can use in Canvas",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "compile": "tsc src/*.ts --outDir lib/ --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/welefen/grid-layout.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/welefen/grid-layout/issues"
+  },
+  "homepage": "https://github.com/welefen/grid-layout#readme",
+  "devDependencies": {
+    "typescript": "^3.6.4"
+  }
+}
