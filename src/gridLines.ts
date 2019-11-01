@@ -90,3 +90,11 @@ export class GridLineRepeat extends GridLineBase {
     this.value = value;
   }
 }
+
+export class GridLine<T> extends GridLineBase {
+  lines: T[];
+  constructor(lines: T[]) {
+    super();
+    this.lines = lines;
+  }
+}

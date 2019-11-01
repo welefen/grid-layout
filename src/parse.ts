@@ -8,7 +8,8 @@ import {
   GridLineFitContent,
   GridLineMinMax,
   GridLineRepeat,
-  GridLineRepeatValue
+  GridLineRepeatValue,
+  GridLine
 } from './gridLines';
 
 const whitespace = ' \u00a0\n\r\t\f\u000b\u200b\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u202f\u205f\u3000';
@@ -184,9 +185,9 @@ export class GridLineParser {
       }
       if(item === 'minmax' && supports.indexOf('minmax') > -1) {
         value = this.parseMinMax();
-      } else if(item === 'fit-content' || supports.indexOf('fit-content') > -1) {
+      } else if(item === 'fit-content' && supports.indexOf('fit-content') > -1) {
         value = this.parseFitContent();
-      } else if(item === 'repeat' || supports.indexOf('repeat') > -1) {
+      } else if(item === 'repeat' && supports.indexOf('repeat') > -1) {
         value = this.parseRepeat();
       } else {
         value = this.parseValue(item);
@@ -198,7 +199,9 @@ export class GridLineParser {
     return {lines, lineNames};
   }
   parse() {
-    const {lines} = this.parseCondition(_ => true, ['minmax', 'fit-content', 'repeat']);
-    return lines;
+    const {lines, lineNames} = this.parseCondition(_ => true, ['minmax', 'fit-content', 'repeat']);
+    const instance = new GridLine(lines);
+    instance.lineNames = lineNames;
+    return instance;
   }
 }
