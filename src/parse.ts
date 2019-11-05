@@ -126,7 +126,7 @@ export class GridLineParser {
     return new GridLineFitContent(val as (GridLineLength | GridLinePercentage));
   }
   // minmax()
-  private parseMinMax() {
+  private parseMinMax(): GridLineMinMax {
     this.nextNeed('(');
     const minValue = this.peek();
     const min = this.parseValue(minValue);
@@ -143,7 +143,7 @@ export class GridLineParser {
     throw new Error(`error parameters ${minValue} and ${maxValue}`);
   }
   // [linename1 linename2]
-  parseLineNames() {
+  parseLineNames(): string[] {
     const lineNames: string[] = [];
     let isEnd = false;
     while(this.index < this.length) {
@@ -160,13 +160,21 @@ export class GridLineParser {
     }
     return lineNames;
   }
-  parseRepeat() {
+  parseRepeat(): GridLineRepeat {
     this.nextNeed('(');
     const repeatNum = parseRepeatNum(this.peek());
     this.nextNeed(',');
+    let isEnd = false;
     const result = this.parseCondition(str => {
-      return str !== ')';
+      const flag = (str !== ')');
+      if(!flag) {
+        isEnd = true;
+      }
+      return flag;
     }, ['minmax', 'fit-content']);
+    if(!isEnd) {
+      throw new Error('can not find ) in repeat syntax');
+    }
     const value = new GridLineRepeatValue(result.lines);
     value.lineNames = result.lineNames;
     const instance = new GridLineRepeat(repeatNum, value);
