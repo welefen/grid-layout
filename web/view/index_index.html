@@ -1,0 +1,89 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>grid-layout</title>
+  <style>
+  *{padding:0;margin:0}
+  html,body{width: 100%;height: 100%;}
+  .AdminBody{height: 100vh;;}
+  /* .AdminBody .el-aside {background: #545c64} */
+  .AdminBody .el-aside .el-menu {border-right: 0}
+  .AdminBody .el-main {padding:0;background: #eee;}
+  .AdminAside h1{
+    font-size: 24px;
+    line-height: 60px;
+    padding-left: 20px;
+    background: #2f3c46;
+    color: #fff;
+  }
+  .shadow{
+    /* box-shadow: inset 0 0 0 1px rgba(48,56,69,.2) */
+  }
+  .grid-container{
+    position: relative;
+    background: #fff;
+  }
+  .grid-render-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom:0;
+  }
+  .grid-render-grid {
+    display: grid;
+  }
+  .grid-render-grid::before {
+    position: absolute;
+    content: '浏览器 grid 渲染';
+    top: -60px;
+    left: 0;
+    color: #ccc;
+    font-size: 30px;
+  }
+  .grid-render-absolute::before {
+    position: absolute;
+    content: '计算后 Absolute 定位渲染';
+    top: -60px;
+    left: 0;
+    color: #ccc;
+    font-size: 30px;
+  }
+  .grid-item {
+    border: 0 solid red;
+  }
+  .absolute-item {
+    border: 0 solid red;
+    position: absolute;
+  }
+  .grid-active {
+    box-shadow: 0 0 0 2px #68cfbb, 0 0 15px rgba(0,0,0,.2), inset 0 0 0 1px hsla(0,0%,100%,.2);
+  }
+  .AdminBlock {
+    background: white;
+    /* padding: 20px; */
+    border-radius: 3px;
+    margin-bottom: 15px;
+  }
+  .AdminBlock h2{
+    margin-bottom: 30px;
+  }
+  .el-menu-item.is-active {
+    background-color: rgb(67, 74, 80) !important;
+  }
+  </style>
+  <link rel="stylesheet" href="https://lib.baomitu.com/element-ui/2.3.9/theme-chalk/index.css">
+</head>
+<body>
+<div id="fake-body">
+  <mount-vessel></mount-vessel>
+</div>
+<script src="https://lib.baomitu.com/jquery/3.1.0/jquery.min.js"></script>
+<script src="https://lib.baomitu.com/vue/2.5.9/vue.min.js"></script>
+<script src="https://lib.baomitu.com/echarts/3.8.5/echarts.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/v-charts/lib/index.min.js"></script>
+<script src="/static/js/gridlayout.js"></script>
+</body>
+</html>
