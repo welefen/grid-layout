@@ -35,7 +35,7 @@ test('1fr', t => {
 test('auto 1fr', t => {
   const instance = new TrackListParser('auto 1fr');
   const result = instance.parse();
-  t.deepEqual(result, {"lines":[{"value":"auto","lineNames":[]},{"value":1,"unit":"fr","lineNames":[]}],"lineNames":[]})
+  t.deepEqual(result, {"lines":[{"value":"auto", "unit": "","lineNames":[]},{"value":1,"unit":"fr","lineNames":[]}],"lineNames":[]})
 });
 
 test('150px [item1-start] 1fr [item1-end]', t => {
@@ -47,7 +47,7 @@ test('150px [item1-start] 1fr [item1-end]', t => {
 test('1fr minmax(min-content, 1fr)', t => {
   const instance = new TrackListParser('1fr minmax(min-content, 1fr)');
   const result = instance.parse();
-  t.deepEqual(result, {"lines":[{"value":1,"unit":"fr","lineNames":[]},{"type":"minmax","args":[{"value":"min-content"},{"value":1,"unit":"fr"}],"lineNames":[]}],"lineNames":[]});
+  t.deepEqual(result, {"lines":[{"value":1,"unit":"fr","lineNames":[]},{"type":"minmax","args":[{"value":"min-content", unit: ''},{"value":1,"unit":"fr"}],"lineNames":[]}],"lineNames":[]});
 });
 
 test('repeat(auto-fill, minmax(25, 1fr))', t => {
@@ -60,5 +60,5 @@ test('[a] auto [b] minmax(min-content, 1fr) [b c d] repeat(2, [e] 40px) repeat(5
   const instance = new TrackListParser('[a] auto [b] minmax(min-content, 1fr) [b c d] repeat(2, [e] 40px) repeat(5, auto)');
   const result = instance.parse();
   // console.log(JSON.stringify(result))
-  t.deepEqual(result, {"lines":[{"value":"auto","lineNames":["a"]},{"type":"minmax","args":[{"value":"min-content"},{"value":1,"unit":"fr"}],"lineNames":["b"]},{"type":"repeat","args":[2,{"lines":[{"value":40,"unit":"","lineNames":["e"]}],"lineNames":[]}],"lineNames":["b","c","d"]},{"type":"repeat","args":[5,{"lines":[{"value":"auto","lineNames":[]}],"lineNames":[]}],"lineNames":[]}],"lineNames":[]});
+  t.deepEqual(result, {"lines":[{"value":"auto", unit: '',"lineNames":["a"]},{"type":"minmax","args":[{"value":"min-content", unit: ''},{"value":1,"unit":"fr"}],"lineNames":["b"]},{"type":"repeat","args":[2,{"lines":[{"value":40,"unit":"","lineNames":["e"]}],"lineNames":[]}],"lineNames":["b","c","d"]},{"type":"repeat","args":[5,{"lines":[{"value":"auto", unit: '', "lineNames":[]}],"lineNames":[]}],"lineNames":[]}],"lineNames":[]});
 });

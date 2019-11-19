@@ -14,7 +14,7 @@ export default class Container {
     this.children.push(node);
   }
   parseOrder(items: Node[]) {
-    return items.sort((a: Node, b: Node) => {
+    items.sort((a: Node, b: Node) => {
       const ar = a.config.order | 0;
       const br = b.config.order | 0;
       if(a.config.order && b.config.order) return ar > br ? 1 : -1;
@@ -22,21 +22,22 @@ export default class Container {
       if(b.config.order) return br > 0 ? -1 : 1;
       return a.id > b.id ? 1 : -1;
     });
+    return items;
   }
   parse(config?: containerConfig) {
     if(config) {
       Object.assign(this.config, config);
     }
-    this.children = this.parseOrder(this.children);
+    this.parseOrder(this.children);
     if(this.config.gridTemplateRows) {
       const instance = new TrackListParser(<string>this.config.gridTemplateRows);
-      const gridLine = instance.parse();
-      this.config.gridTemplateRows = gridLine;
+      const data = instance.parse();
+      this.config.gridTemplateRows = data;
     }
     if(this.config.gridTemplateColumns) {
       const instance = new TrackListParser(<string>this.config.gridTemplateColumns);
-      const gridLine = instance.parse();
-      this.config.gridTemplateColumns = gridLine;
+      const data = instance.parse();
+      this.config.gridTemplateColumns = data;
     }
   }
   calculateLayout() {

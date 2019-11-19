@@ -4,7 +4,13 @@ export default class Composition {
   constructor(container: Container) {
     this.container = container;
   }
+  parseColumns() {
+    const config = this.container.config;
+    if(config.gridTemplateColumns) {
+      
+    }
+  }
   compose() {
-    
+    this.parseColumns();
   }
 }

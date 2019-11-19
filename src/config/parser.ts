@@ -19,6 +19,10 @@ class Parser {
 }
 
 type conditionChecker = (val: string) => boolean;
+interface parsedValue {
+  value: number | string;
+  unit: string
+}
 
 export class TrackListParser extends Parser {
   parse() {
@@ -27,9 +31,9 @@ export class TrackListParser extends Parser {
     this.length = this.tokens.length;
     return this.parseCondition(_ => true, ['minmax', 'fit-content', 'repeat']);
   }
-  parseValue(value: string) {
+  parseValue(value: string): parsedValue {
     if(value === 'auto' || value === 'min-content' || value === 'max-content') {
-      return {value: value};
+      return {value: value, unit: ''};
     }
     const lenReg = /^(\d+(?:\.\d+)?)+(px|fr|%)?$/;
     const match = value.match(lenReg);
@@ -47,12 +51,24 @@ export class TrackListParser extends Parser {
     }
     throw new Error(`${value} is not allowed`);
   }
+  isFixedBreadth(value: parsedValue): boolean {
+    return !value.unit || value.unit === '%';
+  }
+  isInflexibleBreadth(value: parsedValue): boolean {
+    return this.isFixedBreadth(value) || ['min-content', 'max-content', 'auto'].includes(<string>value.value);
+  }
+  isTrackBreadth(value: parsedValue): boolean {
+    return this.isInflexibleBreadth(value) || value.unit === 'fr';
+  }
   // fit-content(<lenth-percentage>)
   parseFitContent() {
     this.nextNeed('(');
     const value = this.peek();
     this.nextNeed(')');
     const val = this.parseValue(value);
+    if(!this.isFixedBreadth(val)) {
+      throw new Error(`${value} is not allowed in fit-content`);
+    }
     return {type: 'fit-content', args: [val]};
   }
   // minmax(min, max)
@@ -64,7 +80,12 @@ export class TrackListParser extends Parser {
     const maxValue = this.peek();
     const max = this.parseValue(maxValue);
     this.nextNeed(')');
-    return {type: 'minmax', args: [min, max]};
+    if(this.isInflexibleBreadth(min) && this.isTrackBreadth(max) || 
+    this.isFixedBreadth(min) && this.isTrackBreadth(max) || 
+    this.isInflexibleBreadth(min) && this.isFixedBreadth(max)) {
+      return {type: 'minmax', args: [min, max]};
+    }
+    throw new Error(`minmax(${min.value}${min.unit}, ${max.value}${max.unit}) is not allowd`);
   }
   // [linename1 linename2]
   parseLineNames(): string[] {

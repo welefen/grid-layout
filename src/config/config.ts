@@ -5,13 +5,13 @@ export interface containerConfig {
   gridAutoColumns?: string;
   gridAutoFlow?: string;
   gridAutoRows?: string;
-  gridColumnGap?: string;
+  gridColumnGap?: stringOrNumber;
   gridRowGap?: stringOrNumber;
-  gridTemplateAreas?: string;
+  gridTemplateAreas?: string[][];
   gridTemplateRows?: string | object;
   gridTemplateColumns?: string | object;
-  width?: number;
-  height?: number;
+  width: number;
+  height: number;
   alignItems?: itemString;
   justifyItems?: itemString;
   alignContent?: itemString;
