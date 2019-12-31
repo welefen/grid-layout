@@ -4,7 +4,11 @@
     "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,
-    "sourceMap": true,
-    "target": "es6"
-  }
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2015",
+    "outDir": "lib/"
+  },
+  "include": [
+    "src/**/*.ts"
+  ]
 }

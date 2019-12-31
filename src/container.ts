@@ -1,46 +1,56 @@
-import Node from './node';
-import {containerConfig} from './config/config';
-import {TrackListParser} from './config/parser';
+import { Node } from './node';
+import { containerConfig, trackListType, trackList, autoFlow } from './config';
+import { TrackParser } from './parser/track';
+import { TrackCompute } from './compute/track';
 import Composition from './composition';
 
-export default class Container {
+export class Container {
   children: Node[];
-  config:containerConfig;
+  config: containerConfig;
   constructor(config: containerConfig) {
     this.config = config;
   }
-  appendChild(node: Node){
+  public appendChild(node: Node) {
     node.parent = this;
     this.children.push(node);
   }
-  parseOrder(items: Node[]) {
+  private parseOrder(items: Node[]) {
     items.sort((a: Node, b: Node) => {
       const ar = a.config.order | 0;
       const br = b.config.order | 0;
-      if(a.config.order && b.config.order) return ar > br ? 1 : -1;
-      if(a.config.order) return ar > 0 ? 1 : -1;
-      if(b.config.order) return br > 0 ? -1 : 1;
+      if (a.config.order && b.config.order) return ar > br ? 1 : -1;
+      if (a.config.order) return ar > 0 ? 1 : -1;
+      if (b.config.order) return br > 0 ? -1 : 1;
       return a.id > b.id ? 1 : -1;
     });
     return items;
   }
-  parse(config?: containerConfig) {
-    if(config) {
+  private parse(config?: containerConfig) {
+    if (config) {
       Object.assign(this.config, config);
     }
     this.parseOrder(this.children);
-    if(this.config.gridTemplateRows) {
-      const instance = new TrackListParser(<string>this.config.gridTemplateRows);
-      const data = instance.parse();
-      this.config.gridTemplateRows = data;
-    }
-    if(this.config.gridTemplateColumns) {
-      const instance = new TrackListParser(<string>this.config.gridTemplateColumns);
-      const data = instance.parse();
-      this.config.gridTemplateColumns = data;
+    ['gridTemplateRows', 'gridTemplateColumns', 'gridAutoRows', 'gridAutoColumns'].forEach(item => {
+      const instance = new TrackParser(<string>this.config[<trackListType>item]);
+      const type = item.includes('Rows') ? 'row' : 'column';
+      const compute = new TrackCompute(instance.parse(), this, type);
+      this.config[<trackListType>item] = compute.trackList;
+    });
+    // parse grid-auto-flow
+    if (this.config.gridAutoFlow) {
+      const gridAutoFlow = <string>this.config.gridAutoFlow;
+      const autoFlow: autoFlow = {};
+      if (gridAutoFlow.indexOf('row') > -1) {
+        autoFlow.row = true;
+      } else if (gridAutoFlow.indexOf('column') > -1) {
+        autoFlow.column = true;
+      } else if (gridAutoFlow.indexOf('dense') > -1) {
+        autoFlow.dense = true;
+      }
+      this.config.gridAutoFlow = autoFlow;
     }
   }
-  calculateLayout() {
+  public calculateLayout() {
     this.parse();
     this.children.forEach(item => {
       item.parse();

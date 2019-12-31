@@ -1,4 +1,5 @@
-import Container from './container';
+import { Container } from './container';
+import { trackList, trackItem } from './config';
 export default class Composition {
   container: Container
   constructor(container: Container) {
@@ -6,8 +7,8 @@ export default class Composition {
   }
   parseColumns() {
     const config = this.container.config;
-    if(config.gridTemplateColumns) {
-      
+    if (config.gridTemplateColumns) {
+
     }
   }
   compose() {

@@ -7,8 +7,8 @@
     "test": "test"
   },
   "scripts": {
-    "compile": "tsc src/*.ts --outDir lib/ --watch",
-    "test": "tsc test/*.ts && ava test/*.js --verbose"
+    "start": "tsc --watch",
+    "test": "tsc test/**/*.ts && ava test/**/*.js --verbose"
   },
   "ava": {
     "compileEnhancements": false,
@@ -33,5 +33,9 @@
     "ava": "^2.4.0",
     "ts-node": "^8.4.1",
     "typescript": "^3.6.4"
+  },
+  "dependencies": {
+    "deepmerge": "^4.2.2",
+    "ts-deepmerge": "^1.0.2"
   }
 }
