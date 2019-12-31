@@ -117,12 +117,12 @@ export class TrackParser extends Parser {
     }
   }
   parseCondition(checkFn: conditionChecker, supports: string[]): trackList {
-    const tracks: trackItem[] = [];
+    const tracks: trackList = [];
     let lineNames: string[] = [];
     while (this.index < this.length) {
       const item = this.peek();
       if (!checkFn(item)) break;
-      let value: any;
+      let value: trackItem;
       if (item === '[') {
         lineNames = this.parseLineNames();
         continue;
@@ -136,14 +136,20 @@ export class TrackParser extends Parser {
       } else {
         value = this.parseValue(item);
       }
-      value.lineNames = lineNames;
+      value.lineNamesStart = lineNames;
+      if(tracks.length) {
+        tracks[tracks.length - 1].lineNamesEnd = lineNames.slice();
+      }
       lineNames = [];
       tracks.push(value);
     }
-    return { tracks, lineNames };
+    if(lineNames) {
+      tracks[tracks.length - 1].lineNamesEnd = lineNames
+    }
+    return tracks;
   }
   checkAutoRepeatTrack(list: trackList) {
-    list.tracks.forEach(item => {
+    list.forEach(item => {
       const type = item.type;
       if (type === '' || type === '%') return;
       if (type === 'minmax') {
@@ -159,7 +165,7 @@ export class TrackParser extends Parser {
     let autoRepeat = 0;
     let intrinsic = 0;
     let flexible = 0;
-    trackList.tracks.forEach(item => {
+    trackList.forEach(item => {
       switch (item.type) {
         case 'auto-fit-repeat':
         case 'auto-fill-repeat':

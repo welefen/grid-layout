@@ -14,28 +14,19 @@ export class TrackCompute {
     this.parseTrackList();
   }
   /**
-   * expand repeat to trackList
+   * expand fixed repeat to trackList
    * @param track 
    */
-  private expandRepeat(track: trackItem, num?: number): trackList {
-    const repeatNum = num || track.args[0] as number;
-    const repeatValue = track.args[1] as trackList;
-    const result: trackItem[] = [];
+  private expandFixedRepeat(track: trackItem, num?: number): trackList {
+    const repeatNum = <number>(num || track.args[0]);
+    const repeatValue = <trackList>track.args[1];
+    const result: trackList = [];
     let i = 0;
     while (i++ < repeatNum) {
-      const copy = deepmerge([], repeatValue.tracks);
-      if (result.length && repeatValue.lineNames.length) {
-        copy[0].lineNames.push(...repeatValue.lineNames);
-      }
+      const copy = deepmerge([], repeatValue);
       result.push(...copy);
     }
-    if (track.lineNames.length) {
-      result[0].lineNames.push(...track.lineNames);
-    }
-    return {
-      tracks: result,
-      lineNames: repeatValue.lineNames
-    };
+    return result;
   }
   get size() {
     return this.type === 'row' ? this.container.config.height : this.container.config.width;
@@ -58,7 +49,7 @@ export class TrackCompute {
     let repeatTrack: trackItem;
     let repeatIndex: number;
 
-    this.trackList.tracks.forEach((item, index) => {
+    this.trackList.forEach((item, index) => {
       size += this.getTrackItemValue(item);
       if (isAutoRepeat(item)) {
         repeatTrack = item;
@@ -68,15 +59,15 @@ export class TrackCompute {
     let leaveSpace = this.size - size;
     let repeatSize = 0;
     const repeatList = repeatTrack.args[1] as trackList;
-    repeatList.tracks.forEach(item => {
+    repeatList.forEach(item => {
       repeatSize += this.getTrackItemValue(item);
     });
     let count = 1;
     if (leaveSpace > repeatSize) {
       count = Math.floor(leaveSpace / repeatSize);
       if (gap) {
-        const fixLength = this.trackList.tracks.length - 1;
-        const repeatLength = repeatList.tracks.length;
+        const fixLength = this.trackList.length - 1;
+        const repeatLength = repeatList.length;
         while (count > 1) {
           const gapSize = gap * (fixLength + repeatLength * count - 1);
           if (leaveSpace - gapSize - count * repeatSize > 0) {
@@ -87,13 +78,18 @@ export class TrackCompute {
         }
       }
     }
-    const repeatResult = this.expandRepeat(repeatTrack, count);
-    this.trackList.tracks.splice(repeatIndex, 1, ...repeatResult.tracks);
-    if (repeatResult.lineNames.length) {
-      if (repeatIndex) {
-        this.trackList.tracks[repeatIndex - 1].lineNames.push(...repeatResult.lineNames)
-      } else {
-        this.trackList.lineNames.push(...repeatResult.lineNames);
+    const repeatResult = this.expandFixedRepeat(repeatTrack, count);
+    this.trackList.splice(repeatIndex, 1, ...repeatResult);
+  }
+  // merge lineNames
+  private mergeLineNames(): void {
+    const length = this.trackList.length;
+    for (let i = 0; i < length - 1; i++) {
+      const current = this.trackList[i];
+      const next = this.trackList[i + 1];
+      if (current.lineNamesEnd.length !== next.lineNamesStart.length) {
+        current.lineNamesEnd.push(...next.lineNamesStart);
+        next.lineNamesStart.push(...current.lineNamesEnd);
       }
     }
   }
@@ -104,36 +100,27 @@ export class TrackCompute {
    * * parse auto repeat
    */
   private parseTrackList() {
-    const result: trackList = {
-      lineNames: this.trackList.lineNames,
-      tracks: []
-    };
-    let repeatLineNames: string[] = [];
+    const result: trackList = [];
     let hasAutoRepeat = false;
     const size = this.size;
-    this.trackList.tracks.forEach(item => {
+    this.trackList.forEach(item => {
       if (item.type === '%') {
         item.type = '';
         item.value = item.value * size / 100;
         item.baseSize = item.value;
         item.growthLimit = item.value;
       } else if (isFixedRepeat(item)) {
-        const repeatResult = this.expandRepeat(item);
-        result.tracks.push(...repeatResult.tracks);
-        repeatLineNames = repeatResult.lineNames;
+        result.push(...this.expandFixedRepeat(item));
         return;
       } else if (isAutoRepeat(item)) {
         hasAutoRepeat = true;
       }
-      if (repeatLineNames.length) {
-        item.lineNames.push(...repeatLineNames);
-        repeatLineNames = [];
-      }
-      result.tracks.push(item);
+      result.push(item);
     })
     this.trackList = result;
     if (hasAutoRepeat) {
       this.parseAutoRepeat();
     }
+    this.mergeLineNames();
   }
 }

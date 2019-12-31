@@ -3,7 +3,7 @@ type itemString = 'stretch' | 'center' | 'start' | 'end' | 'baseline';
 import { Node } from './node';
 
 export interface containerConfig {
-  gridAutoFlow?: string | autoGrow;
+  gridAutoFlow?: string | autoFlow;
   gridAutoColumns?: string | trackList;
   gridAutoRows?: string | trackList;
   gridColumnGap?: stringOrNumber;
@@ -71,33 +71,26 @@ export interface trackItem {
   args?: Array<number | string | trackItem | trackList>;
   baseSize?: number;
   growthLimit?: number;
-  lineNames?: string[];
+  lineNamesStart?: string[];
+  lineNamesEnd?: string[];
   repeat?: string; // expand from auto-fill repeat or auto-fit repeat
 }
 
-export interface trackList {
-  tracks: trackItem[];
-  lineNames: string[];
-}
+export type trackList = trackItem[];
 
-// grid area
-export interface area {
-  row: number; // row index in area
-  column: number; // column index in area
+// grid ceil
+export interface ceil {
+  row: number; // row index in ceil
+  column: number; // column index in ceil
   width?: number;
   height?: number;
   top?: number;
   left?: number;
-  name?: string; // area name
+  name?: string; // ceil name
   node?: Node[]; // nodes in grid
-  explicit: boolean; // explicit or implicit
-  topLineNames?: string[];
-  rightLineNames?: string[];
-  bottomLineNames?: string[];
-  leftLineNames?: string[];
 }
 
-export interface nodePos {
+export interface position {
   row: number;
   column: number;
 }

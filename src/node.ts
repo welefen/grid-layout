@@ -1,4 +1,4 @@
-import { nodeConfig, borderType, paddingType, marginType, combineType, nodePos, gridLine, stringOrNumber, gridLineType } from './config';
+import { nodeConfig, borderType, paddingType, marginType, combineType, position, gridLine, stringOrNumber, gridLineType } from './config';
 import { Container } from './container';
 
 let id = 1;
@@ -10,7 +10,7 @@ export class Node {
   minContentHeight: number;
   maxContentWidth: number;
   maxContentHeight: number;
-  gridPos: nodePos[];
+  gridPos: position[];
   constructor(config: nodeConfig = {}) {
     this.id = ++id;
     this.config = config;
