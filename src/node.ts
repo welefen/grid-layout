@@ -1,4 +1,4 @@
-import { nodeConfig, borderType, paddingType, marginType, combineType, position, gridLine, stringOrNumber, gridLineType } from './config';
+import { nodeConfig, borderType, paddingType, marginType, combineType, position, gridLine, stringOrNumber, gridLineType, placement } from './config';
 import { Container } from './container';
 
 let id = 1;
@@ -10,11 +10,14 @@ export class Node {
   minContentHeight: number;
   maxContentWidth: number;
   maxContentHeight: number;
-  gridPos: position[];
+  position: position[] = [];
+  placement: placement = {
+    row: {start: -1, end: -1},
+    column: {start: -1, end: -1}
+  };
   constructor(config: nodeConfig = {}) {
     this.id = ++id;
     this.config = config;
-    this.gridPos = [];
   }
   parse(config?: nodeConfig) {
     if (config) {
@@ -29,12 +32,13 @@ export class Node {
         this.parseGridLine(<gridLineType>item);
       }
     })
-    if (!this.config.gridColumnEnd && this.config.gridColumnStart && (<gridLine>this.config.gridColumnStart).customIndent) {
-      this.config.gridColumnEnd = { customIndent: (<gridLine>this.config.gridColumnStart).customIndent };
-    }
-    if (!this.config.gridRowEnd && this.config.gridRowStart && (<gridLine>this.config.gridRowStart).customIndent) {
-      this.config.gridRowEnd = { customIndent: (<gridLine>this.config.gridRowEnd).customIndent };
-    }
+
+    // if (!this.config.gridColumnEnd && this.config.gridColumnStart && (<gridLine>this.config.gridColumnStart).customIndent) {
+    //   this.config.gridColumnEnd = { customIndent: (<gridLine>this.config.gridColumnStart).customIndent };
+    // }
+    // if (!this.config.gridRowEnd && this.config.gridRowStart && (<gridLine>this.config.gridRowStart).customIndent) {
+    //   this.config.gridRowEnd = { customIndent: (<gridLine>this.config.gridRowEnd).customIndent };
+    // }
 
     this.parseSize();
     this.parseContentSize();

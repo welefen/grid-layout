@@ -143,7 +143,7 @@ export class TrackParser extends Parser {
       lineNames = [];
       tracks.push(value);
     }
-    if(lineNames) {
+    if(lineNames.length) {
       tracks[tracks.length - 1].lineNamesEnd = lineNames
     }
     return tracks;

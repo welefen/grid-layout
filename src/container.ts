@@ -1,11 +1,12 @@
 import { Node } from './node';
-import { containerConfig, trackListType, trackList, autoFlow } from './config';
+import { containerConfig, trackListType, autoFlow } from './config';
 import { TrackParser } from './parser/track';
 import { TrackCompute } from './compute/track';
-import Composition from './composition';
+import { AreaParser } from './parser/area';
+import { Composition } from './composition';
 
 export class Container {
-  children: Node[];
+  children: Node[] = [];
   config: containerConfig;
   constructor(config: containerConfig) {
     this.config = config;
@@ -13,6 +14,7 @@ export class Container {
   public appendChild(node: Node) {
     node.parent = this;
     this.children.push(node);
+    return this;
   }
   private parseOrder(items: Node[]) {
     items.sort((a: Node, b: Node) => {
@@ -40,14 +42,20 @@ export class Container {
     if (this.config.gridAutoFlow) {
       const gridAutoFlow = <string>this.config.gridAutoFlow;
       const autoFlow: autoFlow = {};
-      if (gridAutoFlow.indexOf('row') > -1) {
-        autoFlow.row = true;
-      } else if (gridAutoFlow.indexOf('column') > -1) {
+      if (gridAutoFlow.indexOf('column') > -1) {
         autoFlow.column = true;
-      } else if (gridAutoFlow.indexOf('dense') > -1) {
+      } else {
+        autoFlow.row = true;
+      }
+      if (gridAutoFlow.indexOf('dense') > -1) {
         autoFlow.dense = true;
       }
       this.config.gridAutoFlow = autoFlow;
+    }
+    if (this.config.gridTemplateAreas) {
+      const instance = new AreaParser(<string>this.config.gridTemplateAreas);
+      const areas = instance.parse();
+      this.config.gridTemplateAreas = areas;
     }
   }
   public calculateLayout() {
@@ -57,5 +65,8 @@ export class Container {
     })
     const instance = new Composition(this);
     instance.compose();
+  }
+  public getAllComputedLayout() {
+
   }
 }

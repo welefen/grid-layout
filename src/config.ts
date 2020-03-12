@@ -66,7 +66,7 @@ export type gridConfig = containerConfig | nodeConfig;
 export type trackType = 'row' | 'column';
 
 export interface trackItem {
-  type: string; // %/fr/min-content/max-content/fit-content/minmax/repeat/
+  type: string; // auto/%/fr/min-content/max-content/fit-content/minmax/repeat/
   value?: number;
   args?: Array<number | string | trackItem | trackList>;
   baseSize?: number;
@@ -115,4 +115,9 @@ export interface autoFlow {
   row?: boolean;
   column?: boolean;
   dense?: boolean
+}
+
+export interface placement {
+  row: {start: number, end: number};
+  column: {start: number, end: number}
 }

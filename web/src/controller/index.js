@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const assert = require('assert');
 const Base = require('./base.js');
-const {Node} = require('../../../lib/index.js');
+const {Node, Container} = require('../../../lib/index.js');
 const casePath = path.join(think.ROOT_PATH, '../test/case/');
 
 module.exports = class extends Base {
@@ -16,9 +16,9 @@ module.exports = class extends Base {
     const fail = [];
     files.forEach((file) => {
       const data = JSON.parse(fs.readFileSync(path.join(casePath, file), 'utf8'));
-      const container = Node.create(data.container);
+      const container = new Container(data.container);
       data.items.forEach((item) => {
-        const node = Node.create(item);
+        const node = new Node(item);
         container.appendChild(node);
       });
       container.calculateLayout();
@@ -37,7 +37,7 @@ module.exports = class extends Base {
   renderAction() {
     const container = JSON.parse(this.post('container'));
     const items = JSON.parse(this.post('items'));
-    const containerNode = new Node(container);
+    const containerNode = new Container(container);
     items.forEach((item) => {
       const node = new Node(item);
       containerNode.appendChild(node);
@@ -51,6 +51,7 @@ module.exports = class extends Base {
       const layout = containerNode.getAllComputedLayout(props);
       return this.success(layout);
     } catch (e) {
+      console.log(e)
       return this.fail(1000, e.message);
     }
   }
