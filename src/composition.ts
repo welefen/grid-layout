@@ -24,5 +24,7 @@ export class Composition {
   compose() {
     const rowInstance = new TrackSizeCompute(this.rowTrack, this.ceils, this.container, 'row');
     rowInstance.parse();
+    const columnInstane = new TrackSizeCompute(this.columnTrack, this.ceils, this.container, 'column');
+    columnInstane.parse();
   }
 }

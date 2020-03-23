@@ -19,3 +19,32 @@ export function isAutoRepeat(value: trackItem): boolean {
 export function isFixedRepeat(value: trackItem): boolean {
   return value.type === 'fixed-repeat';
 }
+
+
+export function isAutoTrack(track: trackItem): boolean {
+  return track.type === 'auto';
+}
+
+export function isFrTrack(track: trackItem): boolean {
+  return track.type === 'fr';
+}
+
+export function isMinMaxTrack(track: trackItem): boolean {
+  return track.type === 'minmax';
+}
+
+export function isFrMinMaxTrack(track: trackItem): boolean {
+  if (isMinMaxTrack(track)) {
+    const max = <trackItem>track.args[1];
+    return max.type === 'fr';
+  }
+  return false;
+}
+
+export function isAutoMinMaxTrack(track: trackItem): boolean {
+  if (isMinMaxTrack(track)) {
+    const max = <trackItem>track.args[1];
+    return max.type === 'auto';
+  }
+  return false;
+}

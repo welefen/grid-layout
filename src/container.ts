@@ -57,6 +57,12 @@ export class Container {
       const areas = instance.parse();
       this.config.gridTemplateAreas = areas;
     }
+    if (typeof this.config.gridRowGap === 'string') {
+      this.config.gridRowGap = parseFloat(this.config.gridRowGap) || 0;
+    }
+    if (typeof this.config.gridColumnGap === 'string') {
+      this.config.gridColumnGap = parseFloat(this.config.gridColumnGap) || 0;
+    }
   }
   public calculateLayout() {
     this.parse();
