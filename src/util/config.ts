@@ -80,32 +80,20 @@ export interface TrackItem {
 
 export type TrackList = TrackItem[];
 
+
+export interface BoundingRect {
+  top?: number;
+  left?: number;
+  width?: number;
+  height?: number;
+}
+
 // grid cell
-export interface GridCell {
+export interface GridCell extends BoundingRect {
   row: number; // row index in cell
   column: number; // column index in cell
-  width?: number;
-  height?: number;
-  top?: number;
-  left?: number;
   name?: string; // cell name
   node?: Node[]; // nodes in grid
-}
-
-export interface nodePos {
-  top?: number;
-  left?: number;
-  width?: number;
-  height?: number;
-}
-
-export interface layout extends nodePos {
-  children?: nodePos[]
-}
-
-export interface position {
-  row: number;
-  column: number;
 }
 
 export type GridLineProperty = 'gridRowStart' | 'gridRowEnd' | 'gridColumnStart' | 'gridColumnEnd';

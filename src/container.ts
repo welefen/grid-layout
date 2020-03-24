@@ -1,9 +1,13 @@
 import { Node } from './node';
-import { ContainerConfig, TrackSizeProperty, GridAutoFlow, layout } from './util/config';
+import { ContainerConfig, TrackSizeProperty, GridAutoFlow, BoundingRect } from './util/config';
 import { TrackParser } from './parser/track';
 import { TrackCompute } from './compute/track';
 import { AreaParser } from './parser/area';
 import { Composition } from './compute/composition';
+
+interface ContainerBoundingRect extends BoundingRect {
+  children?: BoundingRect[]
+}
 
 export class Container {
   children: Node[] = [];
@@ -73,7 +77,7 @@ export class Container {
     instance.compose();
   }
   public getAllComputedLayout() {
-    const layout: layout = { top: 0, left: 0, width: this.config.width, height: this.config.height };
+    const layout: ContainerBoundingRect = { top: 0, left: 0, width: this.config.width, height: this.config.height };
     layout.children = this.children.sort((a, b) => {
       return a.id > b.id ? 1 : -1;
     }).map(item => {

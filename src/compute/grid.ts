@@ -1,8 +1,13 @@
 import deepmerge from 'ts-deepmerge';
-import { GridCell, position, TrackList, GridLine, GridAutoFlow, GridPlacement, TrackType } from '../util/config';
+import { GridCell, TrackList, GridLine, GridAutoFlow, TrackType } from '../util/config';
 import { Node } from '../node';
 import { Container } from '../container';
 
+
+interface position {
+  row: number;
+  column: number;
+}
 
 interface AreaNames {
   [key: string]: position[];
@@ -63,7 +68,7 @@ export class GridCompute {
       this.cells[row][column] = this.getInitCeil(row, column);
     }
     this.cells[row][column].node.push(node);
-    node.position.push({ row, column });
+    node.cells.push(this.cells[row][column]);
   }
   /**
    * flex track size

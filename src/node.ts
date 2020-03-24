@@ -1,4 +1,4 @@
-import { NodeConfig, BorderProperty, PaddingProperty, MarginProperty, BorderPaddingMarginProperty, position, GridLine, StringOrNumber, GridLineProperty, GridPlacement, nodePos, TrackType } from './util/config';
+import { NodeConfig, BorderProperty, BorderPaddingMarginProperty, GridLine, StringOrNumber, GridLineProperty, GridPlacement, BoundingRect, TrackType, GridCell } from './util/config';
 import { Container } from './container';
 
 let id = 1;
@@ -10,8 +10,8 @@ export class Node {
   minContentHeight: number;
   maxContentWidth: number;
   maxContentHeight: number;
-  pos: nodePos = {};
-  position: position[] = []; // position in cells
+  boundingRect: BoundingRect = {};
+  cells: GridCell[] = []; // node in cells
   placement: GridPlacement = { // node placement with grid-row-start/grid-column-start
     row: { start: -1, end: -1 },
     column: { start: -1, end: -1 }
@@ -180,8 +180,8 @@ export class Node {
     this.minContentHeight = this.parseContentHeight(this.config.minContentHeight);
     this.maxContentWidth = this.parseContentWidth(this.config.maxContentWidth);
     this.maxContentHeight = this.parseContentHeight(this.config.maxContentHeight);
-    this.pos.width = this.parseComputedWidth(this.config.minContentWidth);
-    this.pos.height = this.parseComputedHeight(this.config.minContentHeight);
+    this.boundingRect.width = this.parseComputedWidth(this.config.minContentWidth);
+    this.boundingRect.height = this.parseComputedHeight(this.config.minContentHeight);
   }
   getFitContentWidth(value: number): number {
     let width = <number>this.config.width;
@@ -211,77 +211,77 @@ export class Node {
     }
     return this.parseLayoutHeight(value);
   }
-  private parseAutoMargin(type: TrackType, pos: nodePos): boolean {
+  private parseAutoMargin(type: TrackType, boundingRect: BoundingRect): boolean {
     const isRow = type === 'row';
     const marginStart = isRow ? this.config.marginTop : this.config.marginLeft;
     const marginEnd = isRow ? this.config.marginBottom : this.config.marginRight;
     const startAuto = marginStart === 'auto';
     const endAuto = marginEnd === 'auto';
     if (startAuto || endAuto) {
-      const size = isRow ? (pos.height - this.pos.height) : (pos.width - this.pos.width);
+      const size = isRow ? (boundingRect.height - this.boundingRect.height) : (boundingRect.width - this.boundingRect.width);
       const prop = isRow ? 'top' : 'left';
       if (size > 0) {
         if (startAuto && endAuto) {
-          this.pos[prop] = pos[prop] + size / 2;
+          this.boundingRect[prop] = boundingRect[prop] + size / 2;
         } else if (startAuto) {
-          this.pos[prop] = pos[prop] + size;
+          this.boundingRect[prop] = boundingRect[prop] + size;
         } else {
-          this.pos[prop] = pos[prop];
+          this.boundingRect[prop] = boundingRect[prop];
         }
       } else {
-        this.pos[prop] = pos[prop];
+        this.boundingRect[prop] = boundingRect[prop];
       }
       return true;
     }
     return false;
   }
-  private parseAlign(align: string, type: TrackType, pos: nodePos): void {
+  private parseAlign(align: string, type: TrackType, boundingRect: BoundingRect): void {
     const isRow = type === 'row';
     const prop = isRow ? 'top' : 'left';
     const sizeProp = isRow ? 'height' : 'width';
-    const size = pos[sizeProp] - this.pos[sizeProp];
+    const size = boundingRect[sizeProp] - this.boundingRect[sizeProp];
     switch (align) {
       case 'start':
-        this.pos[prop] = pos[prop];
+        this.boundingRect[prop] = boundingRect[prop];
         break;
       case 'center':
-        this.pos[prop] = pos[prop] + size / 2;
+        this.boundingRect[prop] = boundingRect[prop] + size / 2;
         break;
       case 'end':
-        this.pos[prop] = pos[prop] + size;
+        this.boundingRect[prop] = boundingRect[prop] + size;
         break;
       case 'stretch':
         if (!this.config[sizeProp]) {
           const min = <number>(isRow ? this.config.minHeight : this.config.minWidth);
           const max = <number>(isRow ? this.config.maxHeight : this.config.maxWidth);
-          const value = this.parseMinMaxValue(size + this.pos[sizeProp], min, max);
-          if (value > this.pos[sizeProp]) {
-            this.pos[sizeProp] = value;
+          const value = this.parseMinMaxValue(size + this.boundingRect[sizeProp], min, max);
+          if (value > this.boundingRect[sizeProp]) {
+            this.boundingRect[sizeProp] = value;
           }
-          this.pos[prop] = pos[prop];
+          this.boundingRect[prop] = boundingRect[prop];
         } else {
-          this.pos[prop] = pos[prop];
+          this.boundingRect[prop] = boundingRect[prop];
         }
         break;
     }
   }
-  parsePosition(pos: nodePos) {
-    if (!this.parseAutoMargin('row', pos)) {
+  parsePosition(boundingRect: BoundingRect) {
+    if (!this.parseAutoMargin('row', boundingRect)) {
       let alignSelf = this.config.alignSelf;
       if (alignSelf === 'auto') {
         alignSelf = this.parent.config.alignItems;
       }
-      this.parseAlign(alignSelf, 'row', pos);
+      this.parseAlign(alignSelf, 'row', boundingRect);
     }
-    if (!this.parseAutoMargin('column', pos)) {
+    if (!this.parseAutoMargin('column', boundingRect)) {
       let justifySelf = this.config.justifySelf;
       if (justifySelf === 'auto') {
         justifySelf = this.parent.config.justifyItems;
       }
-      this.parseAlign(justifySelf, 'column', pos);
+      this.parseAlign(justifySelf, 'column', boundingRect);
     }
   }
   getComputedLayout() {
-    return this.pos;
+    return this.boundingRect;
   }
 }

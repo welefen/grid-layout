@@ -1,6 +1,6 @@
 import { Container } from '../container';
 import { GridCompute } from './grid';
-import { TrackList, GridCell, nodePos } from '../util/config';
+import { TrackList, GridCell, BoundingRect } from '../util/config';
 import { Node } from '../node';
 import { TrackSizeCompute } from './trackSize';
 
@@ -38,17 +38,16 @@ export class Composition {
       const lefts: number[] = [];
       const bottoms: number[] = [];
       const rights: number[] = [];
-      node.position.forEach(pos => {
-        const cell = this.cells[pos.row][pos.column];
+      node.cells.forEach(cell => {
         tops.push(cell.top);
         lefts.push(cell.left);
         rights.push(cell.left + cell.width);
         bottoms.push(cell.top + cell.height);
       })
-      const pos: nodePos = { top: Math.min(...tops), left: Math.min(...lefts) };
-      pos.width = Math.max(...rights) - pos.left;
-      pos.height = Math.max(...bottoms) - pos.top;
-      node.parsePosition(pos);
+      const boundingRect: BoundingRect = { top: Math.min(...tops), left: Math.min(...lefts) };
+      boundingRect.width = Math.max(...rights) - boundingRect.left;
+      boundingRect.height = Math.max(...bottoms) - boundingRect.top;
+      node.parsePosition(boundingRect);
     })
   }
   compose() {
