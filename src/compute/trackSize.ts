@@ -1,4 +1,4 @@
-import { TrackList, GridCell, TrackItem, TrackType } from '../config';
+import { TrackList, GridCell, TrackItem, TrackType } from '../util/config';
 import { Container } from '../container';
 import { isAutoMinMaxTrack, isAutoTrack, isMinMaxTrack, isFrTrack, parseSpaceBetween } from '../util/track';
 

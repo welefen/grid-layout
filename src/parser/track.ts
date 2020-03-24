@@ -1,5 +1,5 @@
 import { Parser } from './base';
-import { TrackItem, TrackList } from '../config';
+import { TrackItem, TrackList } from '../util/config';
 import { TrackTokenizer } from '../tokenizer/track';
 import { isFixedBreadth, isInflexibleBreadth, isTrackBreadth } from '../util/track';
 

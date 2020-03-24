@@ -1,4 +1,4 @@
-import { NodeConfig, BorderProperty, PaddingProperty, MarginProperty, BorderPaddingMarginProperty, position, GridLine, StringOrNumber, GridLineProperty, GridPlacement, nodePos, TrackType } from './config';
+import { NodeConfig, BorderProperty, PaddingProperty, MarginProperty, BorderPaddingMarginProperty, position, GridLine, StringOrNumber, GridLineProperty, GridPlacement, nodePos, TrackType } from './util/config';
 import { Container } from './container';
 
 let id = 1;

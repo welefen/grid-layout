@@ -1,5 +1,5 @@
 import deepmerge from 'ts-deepmerge';
-import { GridCell, position, TrackList, GridLine, GridAutoFlow, GridPlacement, TrackType } from '../config';
+import { GridCell, position, TrackList, GridLine, GridAutoFlow, GridPlacement, TrackType } from '../util/config';
 import { Node } from '../node';
 import { Container } from '../container';
 

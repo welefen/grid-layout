@@ -1,8 +1,8 @@
-import { Container } from './container';
-import { GridCompute } from './compute/grid';
-import { TrackList, GridCell, nodePos } from './config';
-import { Node } from './node';
-import { TrackSizeCompute } from './compute/trackSize';
+import { Container } from '../container';
+import { GridCompute } from './grid';
+import { TrackList, GridCell, nodePos } from '../util/config';
+import { Node } from '../node';
+import { TrackSizeCompute } from './trackSize';
 
 export class Composition {
   container: Container;

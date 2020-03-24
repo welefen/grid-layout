@@ -1,4 +1,4 @@
-import { Node } from './node';
+import { Node } from '../node';
 
 type SelfAlignment = 'stretch' | 'center' | 'start' | 'end' | 'auto';
 type ContentAlignment = 'stretch' | 'start' | 'center' | 'end' | 'space-between' | 'space-around' | 'space-evenly';

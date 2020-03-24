@@ -1,4 +1,4 @@
-import { TrackItem } from '../config';
+import { TrackItem } from './config';
 
 export function isFixedBreadth(value: TrackItem): boolean {
   return !value.type || value.type === '%';

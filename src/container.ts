@@ -1,9 +1,9 @@
 import { Node } from './node';
-import { ContainerConfig, TrackSizeProperty, GridAutoFlow, layout } from './config';
+import { ContainerConfig, TrackSizeProperty, GridAutoFlow, layout } from './util/config';
 import { TrackParser } from './parser/track';
 import { TrackCompute } from './compute/track';
 import { AreaParser } from './parser/area';
-import { Composition } from './composition';
+import { Composition } from './compute/composition';
 
 export class Container {
   children: Node[] = [];
