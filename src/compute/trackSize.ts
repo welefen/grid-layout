@@ -1,6 +1,6 @@
 import { TrackList, GridCell, TrackItem, TrackType } from '../util/config';
 import { Container } from '../container';
-import { isAutoMinMaxTrack, isAutoTrack, isMinMaxTrack, isFrTrack, parseSpaceBetween } from '../util/track';
+import { isAutoMinMaxTrack, isAutoTrack, isMinMaxTrack, isFrTrack, parseAlignSpace } from '../util/track';
 
 export class TrackSizeCompute {
   trackList: TrackList;
@@ -220,7 +220,7 @@ export class TrackSizeCompute {
     })
     const config = this.container.config;
     const type = this.type === 'row' ? config.alignContent : config.justifyContent;
-    const marginSize = parseSpaceBetween(freeSpace, type, this.trackList.length);
+    const marginSize = parseAlignSpace(freeSpace, type, this.trackList.length);
     let pos = 0;
     this.trackList.forEach((track, index) => {
       track.pos = pos + marginSize[index];

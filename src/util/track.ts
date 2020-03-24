@@ -55,54 +55,45 @@ export function isAutoMinMaxTrack(track: TrackItem): boolean {
  * @param {String} type start/end
  * @param {Number} num array size
  */
-export function parseSpaceBetween(space: number, type: string, num: number) {
+export function parseAlignSpace(space: number, type: string, num: number) {
   const marginSize = [];
   const fillFull = (size = 0) => {
-    for(let i = marginSize.length; i < num + 1; i++) {
+    for (let i = marginSize.length; i < num + 1; i++) {
       marginSize[i] = size;
     }
   };
-  if(space < 0) {
-    if(type === 'space-between' || type === 'stretch') {
+  if (space < 0) {
+    if (type === 'space-between' || type === 'stretch') {
       type = 'start';
-    } else if(type === 'space-around' || type === 'space-evenly') {
+    } else if (type === 'space-around' || type === 'space-evenly') {
       type = 'center';
     }
   }
-  if(type === 'end') {
+  if (type === 'end') {
     marginSize[0] = space;
     fillFull();
-  } else if(type === 'center') {
+  } else if (type === 'center') {
     const itemSize = space / 2;
     marginSize[0] = itemSize;
     fillFull();
     marginSize[num] = itemSize;
-  } else if(type === 'space-between') {
+  } else if (type === 'space-between') {
     marginSize[0] = 0;
-    if(num === 1) {
+    if (num === 1) {
       fillFull(space);
     } else {
       fillFull(space / (num - 1));
       marginSize[num] = 0;
     }
-  } else if(type === 'space-between-reverse') {
-    if(num === 1) {
-      marginSize[0] = space;
-      fillFull(0);
-    } else {
-      marginSize[0] = 0;
-      fillFull(space / (num - 1));
-      marginSize[num] = 0;
-    }
-  } else if(type === 'space-around') {
+  } else if (type === 'space-around') {
     const itemSize = space / num;
     marginSize[0] = itemSize / 2;
     fillFull(itemSize);
     marginSize[num] = itemSize / 2;
-  } else if(type === 'space-evenly') {
+  } else if (type === 'space-evenly') {
     const itemSize = space / (num + 1);
     fillFull(itemSize);
-  } else if(type === 'stretch') {
+  } else if (type === 'stretch') {
     const itemSize = space / num;
     marginSize[0] = 0;
     fillFull(itemSize);
