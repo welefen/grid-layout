@@ -1,14 +1,14 @@
 import { Container } from './container';
 import { GridCompute } from './compute/grid';
-import { trackList, ceil, nodePos } from './config';
+import { TrackList, GridCell, nodePos } from './config';
 import { Node } from './node';
 import { TrackSizeCompute } from './compute/trackSize';
 
 export class Composition {
   container: Container;
-  rowTrack: trackList;
-  columnTrack: trackList;
-  ceils: ceil[][];
+  rowTrack: TrackList;
+  columnTrack: TrackList;
+  cells: GridCell[][];
   constructor(container: Container) {
     this.container = container;
     const grid = new GridCompute(this.container);
@@ -18,13 +18,13 @@ export class Composition {
     }
     const nodes = this.container.children;
     grid.fromNodes(nodes);
-    this.ceils = grid.ceils;
+    this.cells = grid.cells;
     this.rowTrack = grid.rowTrack;
     this.columnTrack = grid.columnTrack;
   }
   parseCeilSize() {
-    this.ceils.forEach((lines: ceil[], rowIndex: number) => {
-      lines.forEach((item: ceil, columnIndex: number) => {
+    this.cells.forEach((lines: GridCell[], rowIndex: number) => {
+      lines.forEach((item: GridCell, columnIndex: number) => {
         item.width = this.columnTrack[columnIndex].baseSize;
         item.height = this.rowTrack[rowIndex].baseSize;
         item.top = this.rowTrack[rowIndex].pos;
@@ -39,11 +39,11 @@ export class Composition {
       const bottoms: number[] = [];
       const rights: number[] = [];
       node.position.forEach(pos => {
-        const ceil = this.ceils[pos.row][pos.column];
-        tops.push(ceil.top);
-        lefts.push(ceil.left);
-        rights.push(ceil.left + ceil.width);
-        bottoms.push(ceil.top + ceil.height);
+        const cell = this.cells[pos.row][pos.column];
+        tops.push(cell.top);
+        lefts.push(cell.left);
+        rights.push(cell.left + cell.width);
+        bottoms.push(cell.top + cell.height);
       })
       const pos: nodePos = { top: Math.min(...tops), left: Math.min(...lefts) };
       pos.width = Math.max(...rights) - pos.left;
@@ -52,9 +52,9 @@ export class Composition {
     })
   }
   compose() {
-    const rowInstance = new TrackSizeCompute(this.rowTrack, this.ceils, this.container, 'row');
+    const rowInstance = new TrackSizeCompute(this.rowTrack, this.cells, this.container, 'row');
     rowInstance.parse();
-    const columnInstane = new TrackSizeCompute(this.columnTrack, this.ceils, this.container, 'column');
+    const columnInstane = new TrackSizeCompute(this.columnTrack, this.cells, this.container, 'column');
     columnInstane.parse();
     this.parseCeilSize();
     this.parseNodeSize();

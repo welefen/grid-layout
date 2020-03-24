@@ -1,74 +1,75 @@
-export type stringOrNumber = string | number;
-type itemString = 'stretch' | 'center' | 'start' | 'end' | 'baseline';
 import { Node } from './node';
 
-export interface containerConfig {
-  gridAutoFlow?: string | autoFlow;
-  gridAutoColumns?: string | trackList;
-  gridAutoRows?: string | trackList;
-  gridColumnGap?: stringOrNumber;
-  gridRowGap?: stringOrNumber;
+type SelfAlignment = 'stretch' | 'center' | 'start' | 'end' | 'auto';
+type ContentAlignment = 'stretch' | 'start' | 'center' | 'end' | 'space-between' | 'space-around' | 'space-evenly';
+
+
+export type StringOrNumber = string | number;
+
+export interface ContainerConfig {
+  gridAutoFlow?: string | GridAutoFlow;
+  gridAutoColumns?: string | TrackList;
+  gridAutoRows?: string | TrackList;
+  gridColumnGap?: StringOrNumber;
+  gridRowGap?: StringOrNumber;
   gridTemplateAreas?: string | string[][];
-  gridTemplateRows?: string | trackList;
-  gridTemplateColumns?: string | trackList;
+  gridTemplateRows?: string | TrackList;
+  gridTemplateColumns?: string | TrackList;
   width: number;
   height: number;
-  alignItems?: itemString;
-  justifyItems?: itemString;
-  alignContent?: itemString;
-  justifyContent?: itemString;
-  direction?: string;
-  writingMode?: string;
+  alignItems?: SelfAlignment;
+  justifyItems?: SelfAlignment;
+  alignContent?: ContentAlignment;
+  justifyContent?: ContentAlignment;
 }
 
-export interface nodeConfig {
+export interface NodeConfig {
   gridArea?: string;
-  gridColumnEnd?: stringOrNumber | gridLine;
-  gridColumnStart?: stringOrNumber | gridLine;
-  gridRowEnd?: stringOrNumber | gridLine;
-  gridRowStart?: stringOrNumber | gridLine;
-  alignSelf?: itemString | 'auto';
-  justifySelf?: itemString | 'auto';
-  paddingTop?: stringOrNumber;
-  paddingRight?: stringOrNumber;
-  paddingBottom?: stringOrNumber;
-  paddingLeft?: stringOrNumber;
+  gridColumnEnd?: StringOrNumber | GridLine;
+  gridColumnStart?: StringOrNumber | GridLine;
+  gridRowEnd?: StringOrNumber | GridLine;
+  gridRowStart?: StringOrNumber | GridLine;
+  alignSelf?: SelfAlignment;
+  justifySelf?: SelfAlignment;
+  paddingTop?: StringOrNumber;
+  paddingRight?: StringOrNumber;
+  paddingBottom?: StringOrNumber;
+  paddingLeft?: StringOrNumber;
   padding?: any;
-  marginTop?: stringOrNumber;
-  marginRight?: stringOrNumber;
-  marginBottom?: stringOrNumber;
-  marginLeft?: stringOrNumber;
-  margin?: stringOrNumber;
-  borderTop?: stringOrNumber;
-  borderRight?: stringOrNumber;
-  borderBottom?: stringOrNumber;
-  borderLeft?: stringOrNumber;
+  marginTop?: StringOrNumber;
+  marginRight?: StringOrNumber;
+  marginBottom?: StringOrNumber;
+  marginLeft?: StringOrNumber;
+  margin?: StringOrNumber;
+  borderTop?: StringOrNumber;
+  borderRight?: StringOrNumber;
+  borderBottom?: StringOrNumber;
+  borderLeft?: StringOrNumber;
   border?: any;
-  width?: stringOrNumber;
-  height?: stringOrNumber;
+  width?: StringOrNumber;
+  height?: StringOrNumber;
   boxSizing?: string;
   order?: number;
-  minWidth?: stringOrNumber;
-  maxWidth?: stringOrNumber;
-  minHeight?: stringOrNumber;
-  maxHeight?: stringOrNumber;
+  minWidth?: StringOrNumber;
+  maxWidth?: StringOrNumber;
+  minHeight?: StringOrNumber;
+  maxHeight?: StringOrNumber;
   minContentWidth?: number;
   minContentHeight?: number;
   maxContentWidth?: number;
   maxContentHeight?: number;
 }
-export type borderType = 'border' | 'borderTop' | 'borderRight' | 'borderBottom' | 'borderLeft';
-export type paddingType = 'padding' | 'paddingTop' | 'paddingRight' | 'paddingBottom' | 'paddingLeft';
-export type marginType = 'margin' | 'marginTop' | 'marginRight' | 'marginBottom' | 'marginLeft';
-export type combineType = borderType | paddingType | marginType;
+export type BorderProperty = 'border' | 'borderTop' | 'borderRight' | 'borderBottom' | 'borderLeft';
+export type PaddingProperty= 'padding' | 'paddingTop' | 'paddingRight' | 'paddingBottom' | 'paddingLeft';
+export type MarginProperty = 'margin' | 'marginTop' | 'marginRight' | 'marginBottom' | 'marginLeft';
+export type BorderPaddingMarginProperty = BorderProperty | PaddingProperty | MarginProperty;
 
-export type gridConfig = containerConfig | nodeConfig;
-export type trackType = 'row' | 'column';
+export type TrackType = 'row' | 'column';
 
-export interface trackItem {
+export interface TrackItem {
   type: string; // auto/%/fr/min-content/max-content/fit-content/minmax/repeat/
   value?: number;
-  args?: Array<number | string | trackItem | trackList>;
+  args?: Array<number | string | TrackItem | TrackList>;
   baseSize?: number;
   growthLimit?: number;
   lineNamesStart?: string[];
@@ -77,17 +78,17 @@ export interface trackItem {
   pos?: number; // track position
 }
 
-export type trackList = trackItem[];
+export type TrackList = TrackItem[];
 
-// grid ceil
-export interface ceil {
-  row: number; // row index in ceil
-  column: number; // column index in ceil
+// grid cell
+export interface GridCell {
+  row: number; // row index in cell
+  column: number; // column index in cell
   width?: number;
   height?: number;
   top?: number;
   left?: number;
-  name?: string; // ceil name
+  name?: string; // cell name
   node?: Node[]; // nodes in grid
 }
 
@@ -107,14 +108,14 @@ export interface position {
   column: number;
 }
 
-export type gridLineType = 'gridRowStart' | 'gridRowEnd' | 'gridColumnStart' | 'gridColumnEnd';
+export type GridLineProperty = 'gridRowStart' | 'gridRowEnd' | 'gridColumnStart' | 'gridColumnEnd';
 
-export type trackListType = 'gridTemplateRows' | 'gridTemplateColumns' | 'gridAutoRows' | 'gridAutoColumns';
+export type TrackSizeProperty = 'gridTemplateRows' | 'gridTemplateColumns' | 'gridAutoRows' | 'gridAutoColumns';
 
 /**
  * grid line define for grid-column-start/end, grid-row-start/end
  */
-export interface gridLine {
+export interface GridLine {
   span?: boolean;
   customIndent?: string;
   integer?: number;
@@ -123,13 +124,16 @@ export interface gridLine {
 /**
  * grid-auto-grow
  */
-export interface autoFlow {
+export interface GridAutoFlow {
   row?: boolean;
   column?: boolean;
   dense?: boolean
 }
 
-export interface placement {
+/**
+ * parsed grid position
+ */
+export interface GridPlacement {
   row: { start: number, end: number };
   column: { start: number, end: number }
 }

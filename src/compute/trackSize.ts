@@ -1,18 +1,18 @@
-import { trackList, ceil, trackItem, trackType } from '../config';
+import { TrackList, GridCell, TrackItem, TrackType } from '../config';
 import { Container } from '../container';
 import { isAutoMinMaxTrack, isAutoTrack, isMinMaxTrack, isFrTrack, parseSpaceBetween } from '../util/track';
 
 export class TrackSizeCompute {
-  trackList: trackList;
-  ceils: ceil[][];
+  trackList: TrackList;
+  cells: GridCell[][];
   container: Container;
-  type: trackType;
+  type: TrackType;
   containerSize: number;
   freeSpace: number;
   gap: number;
-  constructor(trackList: trackList, ceils: ceil[][], container: Container, type: trackType) {
+  constructor(trackList: TrackList, cells: GridCell[][], container: Container, type: TrackType) {
     this.trackList = trackList;
-    this.ceils = ceils;
+    this.cells = cells;
     this.container = container;
     this.type = type;
     const config = this.container.config;
@@ -21,7 +21,7 @@ export class TrackSizeCompute {
     this.containerSize = this.type === 'row' ? config.height : config.width;
     this.freeSpace = this.containerSize - gap * (trackList.length - 1);
   }
-  private parseTrackItemValue(track: trackItem, index: number): number {
+  private parseTrackItemValue(track: TrackItem, index: number): number {
     switch (track.type) {
       case 'min-content':
         return this.parseMinContent(index);
@@ -39,10 +39,10 @@ export class TrackSizeCompute {
     return -1;
   }
   private parseTrackSize() {
-    this.trackList.forEach((track: trackItem, index: number) => {
+    this.trackList.forEach((track: TrackItem, index: number) => {
       if (isMinMaxTrack(track)) {
-        const min = <trackItem>track.args[0];
-        const max = <trackItem>track.args[1];
+        const min = <TrackItem>track.args[0];
+        const max = <TrackItem>track.args[1];
         const minValue = this.parseTrackItemValue(min, index);
         const maxValue = this.parseTrackItemValue(max, index);
         track.baseSize = minValue;
@@ -60,8 +60,8 @@ export class TrackSizeCompute {
       }
     })
   }
-  private getCeilItems(index: number): ceil[] {
-    const items = this.type === 'row' ? this.ceils[index] : this.ceils.map(item => item[index]);
+  private getCeilItems(index: number): GridCell[] {
+    const items = this.type === 'row' ? this.cells[index] : this.cells.map(item => item[index]);
     return (items || []).filter(item => {
       return item && item.node.length === 1;
     })
@@ -82,8 +82,8 @@ export class TrackSizeCompute {
     });
     return Math.max(...size);
   }
-  private parseFitContent(track: trackItem, index: number) {
-    const arg = <trackItem>track.args[0];
+  private parseFitContent(track: TrackItem, index: number) {
+    const arg = <TrackItem>track.args[0];
     if (arg.type === '%') {
       const config = this.container.config;
       arg.value *= (this.type === 'row' ? config.height : config.width) / 100;
@@ -95,11 +95,11 @@ export class TrackSizeCompute {
   private parseFrTrack() {
     let frCount = 0;
     let freeSpace = this.freeSpace;
-    this.trackList.forEach((track: trackItem) => {
+    this.trackList.forEach((track: TrackItem) => {
       if (isFrTrack(track)) {
         frCount += track.value;
       } else if (isMinMaxTrack(track)) {
-        const max = <trackItem>track.args[1];
+        const max = <TrackItem>track.args[1];
         if (isFrTrack(max)) {
           frCount += max.value;
         } else {
@@ -113,7 +113,7 @@ export class TrackSizeCompute {
     while (true) {
       const itemSpace = Math.max(0, freeSpace) / frCount;
       let flag = false;
-      this.trackList.forEach((track: trackItem, index: number) => {
+      this.trackList.forEach((track: TrackItem, index: number) => {
         if (isFrTrack(track)) {
           const space = track.value * itemSpace;
           const minSpace = this.parseMinContent(index);
@@ -127,12 +127,12 @@ export class TrackSizeCompute {
         }
       })
       if (!flag) {
-        this.trackList.forEach((track: trackItem, index: number) => {
+        this.trackList.forEach((track: TrackItem, index: number) => {
           if (isFrTrack(track)) {
             track.baseSize = track.value * itemSpace;
             track.type = '';
           } else if (isMinMaxTrack(track)) {
-            const max = <trackItem>track.args[1];
+            const max = <TrackItem>track.args[1];
             if (isFrTrack(max)) {
               const space = max.value * itemSpace;
               max.value = space;
@@ -151,10 +151,10 @@ export class TrackSizeCompute {
   private parseMinMaxTrack() {
     let freeSpace = this.freeSpace;
     let minmaxCount = 0;
-    this.trackList.forEach((track: trackItem) => {
+    this.trackList.forEach((track: TrackItem) => {
       freeSpace -= track.baseSize;
       if (isMinMaxTrack(track)) {
-        const max = <trackItem>track.args[1];
+        const max = <TrackItem>track.args[1];
         if (!isAutoTrack(max)) {
           minmaxCount++;
         }
@@ -164,9 +164,9 @@ export class TrackSizeCompute {
     while (true) {
       const itemSpace = freeSpace / minmaxCount;
       let flag = false;
-      this.trackList.forEach((track: trackItem) => {
+      this.trackList.forEach((track: TrackItem) => {
         if (isMinMaxTrack(track)) {
-          const max = <trackItem>track.args[1];
+          const max = <TrackItem>track.args[1];
           if (!isAutoTrack(max) && track.growthLimit < track.baseSize + itemSpace) {
             track.baseSize = track.growthLimit;
             freeSpace -= track.growthLimit - track.baseSize;
@@ -177,9 +177,9 @@ export class TrackSizeCompute {
         }
       })
       if (!flag) {
-        this.trackList.forEach((track: trackItem) => {
+        this.trackList.forEach((track: TrackItem) => {
           if (isMinMaxTrack(track)) {
-            const max = <trackItem>track.args[1];
+            const max = <TrackItem>track.args[1];
             if (!isAutoTrack(max) && track.growthLimit > track.baseSize) {
               track.baseSize += itemSpace;
             }
@@ -195,7 +195,7 @@ export class TrackSizeCompute {
     if (this.type === 'row' && config.alignContent !== 'stretch') return;
     let freeSpace = this.freeSpace;
     let autoCount = 0;
-    this.trackList.forEach((track: trackItem) => {
+    this.trackList.forEach((track: TrackItem) => {
       freeSpace -= track.baseSize;
       if (isAutoTrack(track)) {
         autoCount++;

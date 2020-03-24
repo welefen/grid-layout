@@ -1,12 +1,12 @@
 import { Parser } from './base';
-import { trackItem, trackList } from '../config';
+import { TrackItem, TrackList } from '../config';
 import { TrackTokenizer } from '../tokenizer/track';
 import { isFixedBreadth, isInflexibleBreadth, isTrackBreadth } from '../util/track';
 
 type conditionChecker = (val: string) => boolean;
 
 export class TrackParser extends Parser {
-  parse(): trackList {
+  parse(): TrackList {
     const instance = new TrackTokenizer(this.text);
     this.tokens = instance.getTokens();
     this.length = this.tokens.length;
@@ -14,7 +14,7 @@ export class TrackParser extends Parser {
     this.checkTrack(result);
     return result;
   }
-  parseValue(value: string): trackItem {
+  parseValue(value: string): TrackItem {
     if (value === 'auto' || value === 'min-content' || value === 'max-content') {
       return { type: value, baseSize: 0, growthLimit: Infinity };
     }
@@ -35,7 +35,7 @@ export class TrackParser extends Parser {
     throw new Error(`${value} is not allowed`);
   }
   // fit-content(<lenth-percentage>)
-  parseFitContent(): trackItem {
+  parseFitContent(): TrackItem {
     this.nextNeed('(');
     const value = this.peek();
     this.nextNeed(')');
@@ -46,7 +46,7 @@ export class TrackParser extends Parser {
     return { type: 'fit-content', args: [val], baseSize: 0, growthLimit: Infinity };
   }
   // minmax(min, max)
-  private parseMinMax(): trackItem {
+  private parseMinMax(): TrackItem {
     this.nextNeed('(');
     const minValue = this.peek();
     const min = this.parseValue(minValue);
@@ -90,7 +90,7 @@ export class TrackParser extends Parser {
     }
     throw new Error(`${val} is not allowed`);
   }
-  parseRepeat(): trackItem {
+  parseRepeat(): TrackItem {
     this.nextNeed('(');
     const repeatNum = this.parseRepeatNum(this.peek());
     this.nextNeed(',');
@@ -116,13 +116,13 @@ export class TrackParser extends Parser {
       args: [repeatNum, result]
     }
   }
-  parseCondition(checkFn: conditionChecker, supports: string[]): trackList {
-    const tracks: trackList = [];
+  parseCondition(checkFn: conditionChecker, supports: string[]): TrackList {
+    const tracks: TrackList = [];
     let lineNames: string[] = [];
     while (this.index < this.length) {
       const item = this.peek();
       if (!checkFn(item)) break;
-      let value: trackItem;
+      let value: TrackItem;
       if (item === '[') {
         lineNames = this.parseLineNames();
         continue;
@@ -148,20 +148,20 @@ export class TrackParser extends Parser {
     }
     return tracks;
   }
-  checkAutoRepeatTrack(list: trackList) {
+  checkAutoRepeatTrack(list: TrackList) {
     list.forEach(item => {
       const type = item.type;
       if (type === '' || type === '%') return;
       if (type === 'minmax') {
-        const arg0 = item.args[0] as trackItem;
-        const arg1 = item.args[1] as trackItem;
+        const arg0 = item.args[0] as TrackItem;
+        const arg1 = item.args[1] as TrackItem;
         if (isFixedBreadth(arg0) && isTrackBreadth(arg1)) return;
         if (isInflexibleBreadth(arg0) && isFixedBreadth(arg1)) return;
       }
       throw new Error(`${item.type} not allowed in auto-repeat`);
     })
   }
-  checkTrack(trackList: trackList) {
+  checkTrack(trackList: TrackList) {
     let autoRepeat = 0;
     let intrinsic = 0;
     let flexible = 0;
@@ -170,7 +170,7 @@ export class TrackParser extends Parser {
         case 'auto-fit-repeat':
         case 'auto-fill-repeat':
           autoRepeat++;
-          this.checkAutoRepeatTrack(item.args[1] as trackList);
+          this.checkAutoRepeatTrack(item.args[1] as TrackList);
           break;
         case 'auto':
         case 'fit-content':

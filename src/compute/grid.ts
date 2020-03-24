@@ -1,5 +1,5 @@
 import deepmerge from 'ts-deepmerge';
-import { ceil, position, trackList, gridLine, autoFlow, placement } from '../config';
+import { GridCell, position, TrackList, GridLine, GridAutoFlow, GridPlacement, TrackType } from '../config';
 import { Node } from '../node';
 import { Container } from '../container';
 
@@ -9,35 +9,35 @@ interface AreaNames {
 }
 
 export class GridCompute {
-  ceils: ceil[][] = [];
+  cells: GridCell[][] = [];
   areaNames: AreaNames = {};
   container: Container;
-  rowTrack: trackList;
-  columnTrack: trackList;
-  autoRowTrack: trackList;
+  rowTrack: TrackList;
+  columnTrack: TrackList;
+  autoRowTrack: TrackList;
   autoRowIndex: number = 0; // index of grid-auto-row
-  autoColumnTrack: trackList;
+  autoColumnTrack: TrackList;
   autoColumnIndex: number = 0; // index of grid-auto-column
-  autoFlow: autoFlow;
+  autoFlow: GridAutoFlow;
   constructor(container: Container) {
     this.container = container;
-    this.rowTrack = <trackList>container.config.gridTemplateRows || [];
-    this.columnTrack = <trackList>container.config.gridTemplateColumns || [];
-    this.autoRowTrack = <trackList>container.config.gridAutoRows || [];
+    this.rowTrack = <TrackList>container.config.gridTemplateRows || [];
+    this.columnTrack = <TrackList>container.config.gridTemplateColumns || [];
+    this.autoRowTrack = <TrackList>container.config.gridAutoRows || [];
     if (!this.autoRowTrack.length) {
       this.autoRowTrack[0] = { type: 'auto', baseSize: 0, growthLimit: Infinity };
     }
     if (!this.rowTrack.length) {
       this.rowTrack[0] = this.autoRowTrack[0];
     }
-    this.autoColumnTrack = <trackList>container.config.gridAutoColumns || [];
+    this.autoColumnTrack = <TrackList>container.config.gridAutoColumns || [];
     if (!this.autoColumnTrack.length) {
       this.autoColumnTrack[0] = { type: 'auto', baseSize: 0, growthLimit: Infinity };
     }
     if (!this.columnTrack.length) {
       this.columnTrack[0] = this.autoColumnTrack[0];
     }
-    this.autoFlow = <autoFlow>this.container.config.gridAutoFlow || {};
+    this.autoFlow = <GridAutoFlow>this.container.config.gridAutoFlow || {};
   }
   get rowSize(): number {
     return this.rowTrack.length;
@@ -45,24 +45,24 @@ export class GridCompute {
   get columnSize(): number {
     return this.columnTrack.length;
   }
-  private getInitCeil(row?: number, column?: number): ceil {
+  private getInitCeil(row?: number, column?: number): GridCell {
     return {
       row: row || 0,
       column: column || 0,
       node: []
     }
   }
-  // put node in ceil
+  // put node in cell
   putNodeInCeil(row: number, column: number, node: Node): void {
-    if (!this.ceils[row]) {
-      this.ceils[row] = [];
+    if (!this.cells[row]) {
+      this.cells[row] = [];
       this.flexTrackSize('row', row);
     }
     this.flexTrackSize('column', column);
-    if (!this.ceils[row][column]) {
-      this.ceils[row][column] = this.getInitCeil(row, column);
+    if (!this.cells[row][column]) {
+      this.cells[row][column] = this.getInitCeil(row, column);
     }
-    this.ceils[row][column].node.push(node);
+    this.cells[row][column].node.push(node);
     node.position.push({ row, column });
   }
   /**
@@ -70,7 +70,7 @@ export class GridCompute {
    * @param type track type
    * @param size 
    */
-  private flexTrackSize(type: 'row' | 'column', size: number): void {
+  private flexTrackSize(type: TrackType, size: number): void {
     const isRow = type === 'row';
     const track = isRow ? this.rowTrack : this.columnTrack;
     const autoTrack = isRow ? this.autoRowTrack : this.autoColumnTrack;
@@ -111,8 +111,8 @@ export class GridCompute {
         return;
       }
       const { gridRowStart, gridRowEnd, gridColumnStart, gridColumnEnd } = node.config;
-      const rowPlacement = this.parseGridPlacement(this.rowTrack, <gridLine>gridRowStart, <gridLine>gridRowEnd);
-      const columnPlacement = this.parseGridPlacement(this.columnTrack, <gridLine>gridColumnStart, <gridLine>gridColumnEnd);
+      const rowPlacement = this.parseGridPlacement(this.rowTrack, <GridLine>gridRowStart, <GridLine>gridRowEnd);
+      const columnPlacement = this.parseGridPlacement(this.columnTrack, <GridLine>gridColumnStart, <GridLine>gridColumnEnd);
       if (rowPlacement.start > -1 && columnPlacement.start > -1) {
         for (let i = rowPlacement.start; i < rowPlacement.end; i++) {
           for (let j = columnPlacement.start; j < columnPlacement.end; j++) {
@@ -158,7 +158,7 @@ export class GridCompute {
         for (let j = placement.start; j < placement.end; j++) {
           const rowIndex = isRow ? j : i;
           const columnIndex = isRow ? i : j;
-          if (this.ceils[rowIndex] && this.ceils[rowIndex][columnIndex] && this.ceils[rowIndex][columnIndex]) {
+          if (this.cells[rowIndex] && this.cells[rowIndex][columnIndex] && this.cells[rowIndex][columnIndex]) {
             empty = false;
             break;
           }
@@ -178,7 +178,7 @@ export class GridCompute {
     })
   }
   /**
-   * try to set node in ceils
+   * try to set node in cells
    * @param node 
    * @param placement 
    * @param row 
@@ -192,7 +192,7 @@ export class GridCompute {
     const columnEnd = column.end === - 1 ? columnIndex + 1 : column.end;
     for (let i = rowIndex; i < rowEnd; i++) {
       for (let j = columnIndex; j < columnEnd; j++) {
-        if (this.ceils[i] && this.ceils[i][j] && this.ceils[i][j].node.length) {
+        if (this.cells[i] && this.cells[i][j] && this.cells[i][j].node.length) {
           return false;
         }
       }
@@ -257,7 +257,7 @@ export class GridCompute {
       }
     })
   }
-  private findPositionByCustomIndent(track: trackList, gridLine: gridLine, type: string = 'start'): number {
+  private findPositionByCustomIndent(track: TrackList, gridLine: GridLine, type: string = 'start'): number {
     let index = -1;
     let num = 0;
     let { customIndent, integer = 1 } = gridLine;
@@ -278,7 +278,7 @@ export class GridCompute {
     });
     return index;
   }
-  private parseGridPlacement(track: trackList, start?: gridLine, end?: gridLine) {
+  private parseGridPlacement(track: TrackList, start?: GridLine, end?: GridLine) {
     let startIndex = -1;
     let endIndex = -1;
     if (start) {

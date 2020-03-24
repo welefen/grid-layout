@@ -1,50 +1,50 @@
-import { nodeConfig, borderType, paddingType, marginType, combineType, position, gridLine, stringOrNumber, gridLineType, placement, nodePos } from './config';
+import { NodeConfig, BorderProperty, PaddingProperty, MarginProperty, BorderPaddingMarginProperty, position, GridLine, StringOrNumber, GridLineProperty, GridPlacement, nodePos, TrackType } from './config';
 import { Container } from './container';
 
 let id = 1;
 export class Node {
   id: number = 1;
   parent: Container | null;
-  config: nodeConfig;
+  config: NodeConfig;
   minContentWidth: number;
   minContentHeight: number;
   maxContentWidth: number;
   maxContentHeight: number;
   pos: nodePos = {};
-  position: position[] = []; // position in ceils
-  placement: placement = { // node placement with grid-row-start/grid-column-start
+  position: position[] = []; // position in cells
+  placement: GridPlacement = { // node placement with grid-row-start/grid-column-start
     row: { start: -1, end: -1 },
     column: { start: -1, end: -1 }
   };
-  constructor(config: nodeConfig = {}) {
+  constructor(config: NodeConfig = {}) {
     this.id = id++;
     this.config = config;
   }
-  parse(config?: nodeConfig) {
+  parse(config?: NodeConfig) {
     if (config) {
       Object.assign(this.config, config);
     }
     const keys = Object.keys(this.config);
     keys.forEach(item => {
       if (item.startsWith('border') || item.startsWith('padding') || item.startsWith('margin')) {
-        this.parseCombineProperty(<combineType>item);
+        this.parseCombineProperty(<BorderPaddingMarginProperty>item);
       }
       if (/^grid(?:Row|Column)(?:Start|End)$/.test(item)) {
-        this.parseGridLine(<gridLineType>item);
+        this.parseGridLine(<GridLineProperty>item);
       }
     })
     this.parseSize();
     this.parseContentSize();
   }
-  private parseGridLine(property: gridLineType): void {
-    const value = <stringOrNumber>this.config[property];
+  private parseGridLine(property: GridLineProperty): void {
+    const value = <StringOrNumber>this.config[property];
     if (!value || value === 'auto') {
       this.config[property] = {};
     } else if (typeof value === 'number') {
       this.config[property] = { integer: value }
     } else {
       const arr = (<string>value).split(/\s+/g).filter(item => item);
-      const desc: gridLine = {};
+      const desc: GridLine = {};
       arr.forEach(item => {
         if (item === 'span') {
           if (desc.span) {
@@ -93,12 +93,12 @@ export class Node {
     }
     return value;
   }
-  private parseCombineProperty(property: combineType) {
+  private parseCombineProperty(property: BorderPaddingMarginProperty) {
     const pWidth = <number>this.parent.config.width;
     if (property === 'border' || property === 'padding' || property === 'margin') {
       const values = <number[]>this.parseCombineValue(property).map(item => this.parseNumberValue(item, pWidth));
       const props = [`${property}Top`, `${property}Right`, `${property}Bottom`, `${property}Left`];
-      props.forEach((item: combineType, index) => {
+      props.forEach((item: BorderPaddingMarginProperty, index) => {
         this.config[item] = values[index];
       })
     } else {
@@ -128,7 +128,7 @@ export class Node {
     width += marginLeft + marginRight;
     if (this.config.boxSizing !== 'border-box') {
       const props = ['borderLeft', 'borderRight', 'paddingLeft', 'paddingRight'];
-      props.forEach((item: borderType) => {
+      props.forEach((item: BorderProperty) => {
         width += this.config[item] || 0;
       });
     }
@@ -140,7 +140,7 @@ export class Node {
     height += marginTop + marginBottom;
     if (this.config.boxSizing !== 'border-box') {
       const props = ['borderTop', 'borderBottom', 'paddingTop', 'paddingBottom'];
-      props.forEach((item: borderType) => {
+      props.forEach((item: BorderProperty) => {
         height += this.config[item] || 0;
       });
     }
@@ -211,7 +211,7 @@ export class Node {
     }
     return this.parseLayoutHeight(value);
   }
-  private parseAutoMargin(type: string, pos: nodePos): boolean {
+  private parseAutoMargin(type: TrackType, pos: nodePos): boolean {
     const isRow = type === 'row';
     const marginStart = isRow ? this.config.marginTop : this.config.marginLeft;
     const marginEnd = isRow ? this.config.marginBottom : this.config.marginRight;
@@ -235,7 +235,7 @@ export class Node {
     }
     return false;
   }
-  private parseAlign(align: string, type: string, pos: nodePos): void {
+  private parseAlign(align: string, type: TrackType, pos: nodePos): void {
     const isRow = type === 'row';
     const prop = isRow ? 'top' : 'left';
     const sizeProp = isRow ? 'height' : 'width';

@@ -1,13 +1,13 @@
 import deepmerge from 'ts-deepmerge';
 import { Container } from '../container';
-import { trackList, trackItem, trackType } from '../config';
+import { TrackList, TrackItem, TrackType } from '../config';
 import { isFixedBreadth, isAutoRepeat, isFixedRepeat } from '../util/track';
 
 export class TrackCompute {
-  trackList: trackList;
+  trackList: TrackList;
   container: Container;
-  type: trackType;
-  constructor(trackList: trackList, container: Container, type: trackType) {
+  type: TrackType;
+  constructor(trackList: TrackList, container: Container, type: TrackType) {
     this.trackList = trackList;
     this.container = container;
     this.type = type;
@@ -17,10 +17,10 @@ export class TrackCompute {
    * expand fixed repeat to trackList
    * @param track 
    */
-  private expandFixedRepeat(track: trackItem, num?: number): trackList {
+  private expandFixedRepeat(track: TrackItem, num?: number): TrackList {
     const repeatNum = <number>(num || track.args[0]);
-    const repeatValue = <trackList>track.args[1];
-    const result: trackList = [];
+    const repeatValue = <TrackList>track.args[1];
+    const result: TrackList = [];
     let i = 0;
     while (i++ < repeatNum) {
       const copy = deepmerge([], repeatValue);
@@ -34,11 +34,11 @@ export class TrackCompute {
   get gap(): number {
     return <number>(this.type === 'row' ? this.container.config.gridRowGap : this.container.config.gridColumnGap);
   }
-  private getTrackItemValue(item: trackItem): number {
+  private getTrackItemValue(item: TrackItem): number {
     if (item.type === '') return item.value;
     if (item.type === 'minmax') {
-      const min = item.args[0] as trackItem;
-      const max = item.args[1] as trackItem;
+      const min = item.args[0] as TrackItem;
+      const max = item.args[1] as TrackItem;
       return isFixedBreadth(min) ? min.value : max.value;
     }
     return 0;
@@ -46,7 +46,7 @@ export class TrackCompute {
   private parseAutoRepeat() {
     const gap = this.gap;
     let size = 0;
-    let repeatTrack: trackItem;
+    let repeatTrack: TrackItem;
     let repeatIndex: number;
 
     this.trackList.forEach((item, index) => {
@@ -58,7 +58,7 @@ export class TrackCompute {
     })
     let leaveSpace = this.size - size;
     let repeatSize = 0;
-    const repeatList = repeatTrack.args[1] as trackList;
+    const repeatList = repeatTrack.args[1] as TrackList;
     repeatList.forEach(item => {
       repeatSize += this.getTrackItemValue(item);
     });
@@ -100,7 +100,7 @@ export class TrackCompute {
    * * parse auto repeat
    */
   private parseTrackList() {
-    const result: trackList = [];
+    const result: TrackList = [];
     let hasAutoRepeat = false;
     const size = this.size;
     this.trackList.forEach(item => {

@@ -1,5 +1,5 @@
 import { Node } from './node';
-import { containerConfig, trackListType, autoFlow, layout } from './config';
+import { ContainerConfig, TrackSizeProperty, GridAutoFlow, layout } from './config';
 import { TrackParser } from './parser/track';
 import { TrackCompute } from './compute/track';
 import { AreaParser } from './parser/area';
@@ -7,8 +7,8 @@ import { Composition } from './composition';
 
 export class Container {
   children: Node[] = [];
-  config: containerConfig;
-  constructor(config: containerConfig) {
+  config: ContainerConfig;
+  constructor(config: ContainerConfig) {
     this.config = config;
   }
   public appendChild(node: Node) {
@@ -27,21 +27,21 @@ export class Container {
     });
     return items;
   }
-  private parse(config?: containerConfig) {
+  private parse(config?: ContainerConfig) {
     if (config) {
       Object.assign(this.config, config);
     }
     this.parseOrder(this.children);
     ['gridTemplateRows', 'gridTemplateColumns', 'gridAutoRows', 'gridAutoColumns'].forEach(item => {
-      const instance = new TrackParser(<string>this.config[<trackListType>item]);
+      const instance = new TrackParser(<string>this.config[<TrackSizeProperty>item]);
       const type = item.includes('Rows') ? 'row' : 'column';
       const compute = new TrackCompute(instance.parse(), this, type);
-      this.config[<trackListType>item] = compute.trackList;
+      this.config[<TrackSizeProperty>item] = compute.trackList;
     });
     // parse grid-auto-flow
     if (this.config.gridAutoFlow) {
       const gridAutoFlow = <string>this.config.gridAutoFlow;
-      const autoFlow: autoFlow = {};
+      const autoFlow: GridAutoFlow = {};
       if (gridAutoFlow.indexOf('column') > -1) {
         autoFlow.column = true;
       } else {
