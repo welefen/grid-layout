@@ -27,8 +27,8 @@ export interface nodeConfig {
   gridColumnStart?: stringOrNumber | gridLine;
   gridRowEnd?: stringOrNumber | gridLine;
   gridRowStart?: stringOrNumber | gridLine;
-  alignSelf?: itemString;
-  justifySelf?: itemString;
+  alignSelf?: itemString | 'auto';
+  justifySelf?: itemString | 'auto';
   paddingTop?: stringOrNumber;
   paddingRight?: stringOrNumber;
   paddingBottom?: stringOrNumber;
@@ -74,6 +74,7 @@ export interface trackItem {
   lineNamesStart?: string[];
   lineNamesEnd?: string[];
   repeat?: string; // expand from auto-fill repeat or auto-fit repeat
+  pos?: number; // track position
 }
 
 export type trackList = trackItem[];
@@ -88,6 +89,17 @@ export interface ceil {
   left?: number;
   name?: string; // ceil name
   node?: Node[]; // nodes in grid
+}
+
+export interface nodePos {
+  top?: number;
+  left?: number;
+  width?: number;
+  height?: number;
+}
+
+export interface layout extends nodePos {
+  children?: nodePos[]
 }
 
 export interface position {
@@ -118,6 +130,6 @@ export interface autoFlow {
 }
 
 export interface placement {
-  row: {start: number, end: number};
-  column: {start: number, end: number}
+  row: { start: number, end: number };
+  column: { start: number, end: number }
 }

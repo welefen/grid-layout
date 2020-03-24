@@ -1,4 +1,4 @@
-import { nodeConfig, borderType, paddingType, marginType, combineType, position, gridLine, stringOrNumber, gridLineType, placement } from './config';
+import { nodeConfig, borderType, paddingType, marginType, combineType, position, gridLine, stringOrNumber, gridLineType, placement, nodePos } from './config';
 import { Container } from './container';
 
 let id = 1;
@@ -10,13 +10,14 @@ export class Node {
   minContentHeight: number;
   maxContentWidth: number;
   maxContentHeight: number;
-  position: position[] = [];
-  placement: placement = {
-    row: {start: -1, end: -1},
-    column: {start: -1, end: -1}
+  pos: nodePos = {};
+  position: position[] = []; // position in ceils
+  placement: placement = { // node placement with grid-row-start/grid-column-start
+    row: { start: -1, end: -1 },
+    column: { start: -1, end: -1 }
   };
   constructor(config: nodeConfig = {}) {
-    this.id = ++id;
+    this.id = id++;
     this.config = config;
   }
   parse(config?: nodeConfig) {
@@ -32,18 +33,10 @@ export class Node {
         this.parseGridLine(<gridLineType>item);
       }
     })
-
-    // if (!this.config.gridColumnEnd && this.config.gridColumnStart && (<gridLine>this.config.gridColumnStart).customIndent) {
-    //   this.config.gridColumnEnd = { customIndent: (<gridLine>this.config.gridColumnStart).customIndent };
-    // }
-    // if (!this.config.gridRowEnd && this.config.gridRowStart && (<gridLine>this.config.gridRowStart).customIndent) {
-    //   this.config.gridRowEnd = { customIndent: (<gridLine>this.config.gridRowEnd).customIndent };
-    // }
-
     this.parseSize();
     this.parseContentSize();
   }
-  parseGridLine(property: gridLineType): void {
+  private parseGridLine(property: gridLineType): void {
     const value = <stringOrNumber>this.config[property];
     if (!value || value === 'auto') {
       this.config[property] = {};
@@ -67,15 +60,15 @@ export class Node {
       this.config[property] = desc;
     }
   }
-  parsePercentValue(value: string): false | number {
+  private parsePercentValue(value: string): false | number {
     if (!/%$/.test(value)) return false;
     return 0.01 * parseFloat(value);
   }
-  parseMarginAuto(value: string | number, autoValue = 0) {
+  private parseMarginAuto(value: string | number, autoValue = 0) {
     if (value === 'auto') return autoValue;
     return value || 0;
   }
-  parseCombineValue<T>(value: T | T[]) {
+  private parseCombineValue<T>(value: T | T[]) {
     if (!Array.isArray(value)) {
       value = [value, value, value, value];
     } else if (value.length === 1) {
@@ -87,7 +80,7 @@ export class Node {
     }
     return value;
   }
-  parseNumberValue(value: string | number, parentValue?: number): string | number {
+  private parseNumberValue(value: string | number, parentValue?: number): string | number {
     if (value === 'auto' || typeof value === 'number') return value;
     if (!value) return 0;
     const percentValue = this.parsePercentValue(value);
@@ -100,7 +93,7 @@ export class Node {
     }
     return value;
   }
-  parseCombineProperty(property: combineType) {
+  private parseCombineProperty(property: combineType) {
     const pWidth = <number>this.parent.config.width;
     if (property === 'border' || property === 'padding' || property === 'margin') {
       const values = <number[]>this.parseCombineValue(property).map(item => this.parseNumberValue(item, pWidth));
@@ -112,7 +105,7 @@ export class Node {
       this.config[property] = this.parseNumberValue(this.config[property], pWidth);
     }
   }
-  parseSize() {
+  private parseSize() {
     const pWidth = this.parent.config.width;
     this.config.width = this.parseNumberValue(this.config.width, pWidth);
     this.config.minWidth = this.parseNumberValue(this.config.minWidth, pWidth);
@@ -129,7 +122,7 @@ export class Node {
       this.config.maxHeight = 0;
     }
   }
-  parseLayoutWidth(width: number): number {
+  private parseLayoutWidth(width: number): number {
     const marginLeft = <number>this.parseMarginAuto(this.config.marginLeft);
     const marginRight = <number>this.parseMarginAuto(this.config.marginRight);
     width += marginLeft + marginRight;
@@ -141,7 +134,7 @@ export class Node {
     }
     return width;
   }
-  parseLayoutHeight(height: number): number {
+  private parseLayoutHeight(height: number): number {
     const marginTop = <number>this.parseMarginAuto(this.config.marginTop);
     const marginBottom = <number>this.parseMarginAuto(this.config.marginBottom);
     height += marginTop + marginBottom;
@@ -153,7 +146,7 @@ export class Node {
     }
     return height;
   }
-  parseMinMaxValue(value: number, min: number, max: number) {
+  private parseMinMaxValue(value: number, min: number, max: number) {
     if (min && value < min) {
       value = min;
     }
@@ -162,25 +155,33 @@ export class Node {
     }
     return value;
   }
-  parseContentWidth(owidth: number): number {
+  private parseComputedWidth(owidth?: number): number {
     let width = <number>this.config.width || owidth;
     const minWidth = <number>this.config.minWidth;
     let maxWidth = <number>this.config.maxWidth;
-    width = this.parseMinMaxValue(width, minWidth, maxWidth);
+    return this.parseMinMaxValue(width, minWidth, maxWidth);
+  }
+  private parseContentWidth(owidth: number): number {
+    const width = this.parseComputedWidth(owidth);
     return this.parseLayoutWidth(width);
   }
-  parseContentHeight(oheight: number): number {
+  private parseComputedHeight(oheight?: number): number {
     let height = <number>this.config.height || oheight;
     const minHeight = <number>this.config.minHeight;
     let maxHeight = <number>this.config.maxHeight;
-    height = this.parseMinMaxValue(height, minHeight, maxHeight);
+    return this.parseMinMaxValue(height, minHeight, maxHeight);
+  }
+  private parseContentHeight(oheight: number): number {
+    const height = this.parseComputedHeight(oheight);
     return this.parseLayoutHeight(height);
   }
-  parseContentSize() {
+  private parseContentSize() {
     this.minContentWidth = this.parseContentWidth(this.config.minContentWidth);
     this.minContentHeight = this.parseContentHeight(this.config.minContentHeight);
     this.maxContentWidth = this.parseContentWidth(this.config.maxContentWidth);
     this.maxContentHeight = this.parseContentHeight(this.config.maxContentHeight);
+    this.pos.width = this.parseComputedWidth(this.config.minContentWidth);
+    this.pos.height = this.parseComputedHeight(this.config.minContentHeight);
   }
   getFitContentWidth(value: number): number {
     let width = <number>this.config.width;
@@ -209,5 +210,78 @@ export class Node {
       value = this.config.minContentHeight;
     }
     return this.parseLayoutHeight(value);
+  }
+  private parseAutoMargin(type: string, pos: nodePos): boolean {
+    const isRow = type === 'row';
+    const marginStart = isRow ? this.config.marginTop : this.config.marginLeft;
+    const marginEnd = isRow ? this.config.marginBottom : this.config.marginRight;
+    const startAuto = marginStart === 'auto';
+    const endAuto = marginEnd === 'auto';
+    if (startAuto || endAuto) {
+      const size = isRow ? (pos.height - this.pos.height) : (pos.width - this.pos.width);
+      const prop = isRow ? 'top' : 'left';
+      if (size > 0) {
+        if (startAuto && endAuto) {
+          this.pos[prop] = pos[prop] + size / 2;
+        } else if (startAuto) {
+          this.pos[prop] = pos[prop] + size;
+        } else {
+          this.pos[prop] = pos[prop];
+        }
+      } else {
+        this.pos[prop] = pos[prop];
+      }
+      return true;
+    }
+    return false;
+  }
+  private parseAlign(align: string, type: string, pos: nodePos): void {
+    const isRow = type === 'row';
+    const prop = isRow ? 'top' : 'left';
+    const sizeProp = isRow ? 'height' : 'width';
+    const size = pos[sizeProp] - this.pos[sizeProp];
+    switch (align) {
+      case 'start':
+        this.pos[prop] = pos[prop];
+        break;
+      case 'center':
+        this.pos[prop] = pos[prop] + size / 2;
+        break;
+      case 'end':
+        this.pos[prop] = pos[prop] + size;
+        break;
+      case 'stretch':
+        if (!this.config[sizeProp]) {
+          const min = <number>(isRow ? this.config.minHeight : this.config.minWidth);
+          const max = <number>(isRow ? this.config.maxHeight : this.config.maxWidth);
+          const value = this.parseMinMaxValue(size + this.pos[sizeProp], min, max);
+          if (value > this.pos[sizeProp]) {
+            this.pos[sizeProp] = value;
+          }
+          this.pos[prop] = pos[prop];
+        } else {
+          this.pos[prop] = pos[prop];
+        }
+        break;
+    }
+  }
+  parsePosition(pos: nodePos) {
+    if (!this.parseAutoMargin('row', pos)) {
+      let alignSelf = this.config.alignSelf;
+      if (alignSelf === 'auto') {
+        alignSelf = this.parent.config.alignItems;
+      }
+      this.parseAlign(alignSelf, 'row', pos);
+    }
+    if (!this.parseAutoMargin('column', pos)) {
+      let justifySelf = this.config.justifySelf;
+      if (justifySelf === 'auto') {
+        justifySelf = this.parent.config.justifyItems;
+      }
+      this.parseAlign(justifySelf, 'column', pos);
+    }
+  }
+  getComputedLayout() {
+    return this.pos;
   }
 }

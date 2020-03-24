@@ -1,6 +1,6 @@
 import { trackList, ceil, trackItem, trackType } from '../config';
 import { Container } from '../container';
-import { isAutoMinMaxTrack, isAutoTrack, isMinMaxTrack, isFrTrack } from '../util/track';
+import { isAutoMinMaxTrack, isAutoTrack, isMinMaxTrack, isFrTrack, parseSpaceBetween } from '../util/track';
 
 export class TrackSizeCompute {
   trackList: trackList;
@@ -9,6 +9,7 @@ export class TrackSizeCompute {
   type: trackType;
   containerSize: number;
   freeSpace: number;
+  gap: number;
   constructor(trackList: trackList, ceils: ceil[][], container: Container, type: trackType) {
     this.trackList = trackList;
     this.ceils = ceils;
@@ -16,6 +17,7 @@ export class TrackSizeCompute {
     this.type = type;
     const config = this.container.config;
     const gap = <number>(this.type === 'row' ? config.gridRowGap : config.gridColumnGap);
+    this.gap = gap;
     this.containerSize = this.type === 'row' ? config.height : config.width;
     this.freeSpace = this.containerSize - gap * (trackList.length - 1);
   }
@@ -60,7 +62,7 @@ export class TrackSizeCompute {
   }
   private getCeilItems(index: number): ceil[] {
     const items = this.type === 'row' ? this.ceils[index] : this.ceils.map(item => item[index]);
-    return items.filter(item => {
+    return (items || []).filter(item => {
       return item && item.node.length === 1;
     })
   }
@@ -188,6 +190,9 @@ export class TrackSizeCompute {
     }
   }
   private parseAutoTrack() {
+    const config = this.container.config;
+    if (this.type === 'column' && config.justifyContent !== 'stretch') return;
+    if (this.type === 'row' && config.alignContent !== 'stretch') return;
     let freeSpace = this.freeSpace;
     let autoCount = 0;
     this.trackList.forEach((track: trackItem) => {
@@ -208,10 +213,25 @@ export class TrackSizeCompute {
       }
     })
   }
+  private parseTrackPosition() {
+    let freeSpace = this.freeSpace;
+    this.trackList.forEach(track => {
+      freeSpace -= track.baseSize;
+    })
+    const config = this.container.config;
+    const type = this.type === 'row' ? config.alignContent : config.justifyContent;
+    const marginSize = parseSpaceBetween(freeSpace, type, this.trackList.length);
+    let pos = 0;
+    this.trackList.forEach((track, index) => {
+      track.pos = pos + marginSize[index];
+      pos = track.pos + track.baseSize + this.gap;
+    })
+  }
   public parse() {
     this.parseTrackSize();
     this.parseFrTrack();
     this.parseMinMaxTrack();
     this.parseAutoTrack();
+    this.parseTrackPosition();
   }
 }

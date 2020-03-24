@@ -222,7 +222,7 @@ export default {
         'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
         'margin-top', 'margin-right', 'margin-bottom', 'margin-left',
         'border-top', 'border-right', 'border-bottom', 'border-left',
-        'top', 'left'
+        'top', 'left', 'grid-row-gap', 'grid-column-gap'
       ];
 
       Object.keys(props).forEach((item) => {

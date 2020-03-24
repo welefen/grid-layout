@@ -41,6 +41,7 @@
 
         <el-form-item v-if="type === 'container'" label="justify-content">
           <el-select v-model="gridContainer.justifyContent" placeholder="justifyContent" @change="changeProperty('justifyContent', $event)">
+            <el-option label="stretch" value="stretch"></el-option>
             <el-option label="start" value="start"></el-option>
             <el-option label="end" value="end"></el-option>
             <el-option label="center" value="center"></el-option>
@@ -75,7 +76,6 @@
             <el-option label="start" value="start"></el-option>
             <el-option label="center" value="center"></el-option>
             <el-option label="end" value="end"></el-option>
-            <el-option label="baseline" value="baseline"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="width">
@@ -93,18 +93,16 @@
             <el-option label="start" value="start"></el-option>
             <el-option label="center" value="center"></el-option>
             <el-option label="end" value="end"></el-option>
-            <el-option disabled label="baseline" value="baseline"></el-option>
           </el-select>
         </el-form-item>
 
-        <el-form-item label="align-self">
+        <el-form-item label="justify-self">
           <el-select v-model="gridItem.justifySelf" placeholder="justifySelf" @change="changeProperty('justifySelf', $event)">
             <el-option label="auto" value="auto"></el-option>
             <el-option label="stretch" value="stretch"></el-option>
             <el-option label="start" value="start"></el-option>
             <el-option label="center" value="center"></el-option>
             <el-option label="end" value="end"></el-option>
-            <el-option disabled label="baseline" value="baseline"></el-option>
           </el-select>
         </el-form-item>
 
@@ -229,10 +227,10 @@ const gridContainer = {
   gridAutoColumns: '',
   gridRowGap: '',
   gridColumnGap: '',
-  justifyContent: '',
-  alignItems: '',
-  alignContent: '',
-  justifyItems: '',
+  justifyContent: 'stretch',
+  alignItems: 'stretch',
+  alignContent: 'stretch',
+  justifyItems: 'stretch',
   width: 500,
   height: 500,
 };

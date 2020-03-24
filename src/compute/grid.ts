@@ -1,6 +1,8 @@
+import deepmerge from 'ts-deepmerge';
 import { ceil, position, trackList, gridLine, autoFlow, placement } from '../config';
 import { Node } from '../node';
 import { Container } from '../container';
+
 
 interface AreaNames {
   [key: string]: position[];
@@ -76,9 +78,9 @@ export class GridCompute {
       const length = autoTrack.length;
       for (let i = track.length; i < size; i++) {
         if (isRow) {
-          track[i] = autoTrack[this.autoRowIndex++ % length];
+          track[i] = deepmerge({}, autoTrack[this.autoRowIndex++ % length]);
         } else {
-          track[i] = autoTrack[this.autoColumnIndex++ % length];
+          track[i] = deepmerge({}, autoTrack[this.autoColumnIndex++ % length]);
         }
       }
     }
@@ -129,7 +131,7 @@ export class GridCompute {
         }
       }
       if (columnPlacement.start > -1) {
-        this.flexTrackSize('column', columnPlacement.end + 1);
+        this.flexTrackSize('column', columnPlacement.end);
         // autoflow is column
         if (this.autoFlow.column) {
           givedNodes.push(node);

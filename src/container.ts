@@ -1,5 +1,5 @@
 import { Node } from './node';
-import { containerConfig, trackListType, autoFlow } from './config';
+import { containerConfig, trackListType, autoFlow, layout } from './config';
 import { TrackParser } from './parser/track';
 import { TrackCompute } from './compute/track';
 import { AreaParser } from './parser/area';
@@ -73,6 +73,12 @@ export class Container {
     instance.compose();
   }
   public getAllComputedLayout() {
-
+    const layout: layout = { top: 0, left: 0, width: this.config.width, height: this.config.height };
+    layout.children = this.children.sort((a, b) => {
+      return a.id > b.id ? 1 : -1;
+    }).map(item => {
+      return item.getComputedLayout();
+    });
+    return layout;
   }
 }

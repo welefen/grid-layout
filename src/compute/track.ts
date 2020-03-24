@@ -1,4 +1,4 @@
-import deepmerge from 'deepmerge';
+import deepmerge from 'ts-deepmerge';
 import { Container } from '../container';
 import { trackList, trackItem, trackType } from '../config';
 import { isFixedBreadth, isAutoRepeat, isFixedRepeat } from '../util/track';
