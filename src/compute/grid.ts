@@ -103,7 +103,7 @@ export class GridCompute {
     })
   }
 
-  public fromNodes(nodes: Node[]) {
+  public putNodes(nodes: Node[]) {
     const autoNodes: Node[] = [];
     const givedNodes: Node[] = [];
     nodes.forEach(node => {

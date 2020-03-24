@@ -17,7 +17,7 @@ export class Composition {
       grid.fromAreas(<string[][]>gridTemplateAreas);
     }
     const nodes = this.container.children;
-    grid.fromNodes(nodes);
+    grid.putNodes(nodes);
     this.cells = grid.cells;
     this.rowTrack = grid.rowTrack;
     this.columnTrack = grid.columnTrack;
