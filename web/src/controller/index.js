@@ -59,7 +59,7 @@ module.exports = class extends Base {
   collectAction() {
     const container = JSON.parse(this.post('container'));
     const items = JSON.parse(this.post('items'));
-    const containerNode = new Node(container);
+    const containerNode = new Container(container);
     items.forEach((item) => {
       const node = new Node(item);
       containerNode.appendChild(node);
