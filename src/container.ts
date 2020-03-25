@@ -13,7 +13,7 @@ export class Container {
   children: Node[] = [];
   config: ContainerConfig;
   constructor(config: ContainerConfig) {
-    this.config = config;
+    this.config = Object.assign({}, config);
   }
   public appendChild(node: Node) {
     node.parent = this;
@@ -31,10 +31,7 @@ export class Container {
     });
     return items;
   }
-  private parse(config?: ContainerConfig) {
-    if (config) {
-      Object.assign(this.config, config);
-    }
+  private parse() {
     this.parseOrder(this.children);
     ['gridTemplateRows', 'gridTemplateColumns', 'gridAutoRows', 'gridAutoColumns'].forEach(item => {
       const instance = new TrackParser(<string>this.config[<TrackSizeProperty>item]);

@@ -18,12 +18,9 @@ export class Node {
   };
   constructor(config: NodeConfig = {}) {
     this.id = id++;
-    this.config = config;
+    this.config = Object.assign({}, config);
   }
-  parse(config?: NodeConfig) {
-    if (config) {
-      Object.assign(this.config, config);
-    }
+  parse() {
     const keys = Object.keys(this.config);
     keys.forEach(item => {
       if (item.startsWith('border') || item.startsWith('padding') || item.startsWith('margin')) {
