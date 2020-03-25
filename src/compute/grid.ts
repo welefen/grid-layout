@@ -50,7 +50,7 @@ export class GridCompute {
   get columnSize(): number {
     return this.columnTrack.length;
   }
-  private getInitCeil(row?: number, column?: number): GridCell {
+  private getInitCell(row?: number, column?: number): GridCell {
     return {
       row: row || 0,
       column: column || 0,
@@ -58,14 +58,14 @@ export class GridCompute {
     }
   }
   // put node in cell
-  putNodeInCeil(row: number, column: number, node: Node): void {
+  putNodeInCell(row: number, column: number, node: Node): void {
     if (!this.cells[row]) {
       this.cells[row] = [];
       this.flexTrackSize('row', row);
     }
     this.flexTrackSize('column', column);
     if (!this.cells[row][column]) {
-      this.cells[row][column] = this.getInitCeil(row, column);
+      this.cells[row][column] = this.getInitCell(row, column);
     }
     this.cells[row][column].node.push(node);
     node.cells.push(this.cells[row][column]);
@@ -91,7 +91,7 @@ export class GridCompute {
     }
   }
 
-  public fromAreas(areas: string[][]) {
+  public setAreas(areas: string[][]) {
     areas.forEach((line, row) => {
       line.forEach((name, column) => {
         if (!name) return;
@@ -111,7 +111,7 @@ export class GridCompute {
       // put node in container by grid-area
       if (area && this.areaNames[area]) {
         this.areaNames[area].forEach(pos => {
-          this.putNodeInCeil(pos.row, pos.column, node);
+          this.putNodeInCell(pos.row, pos.column, node);
         })
         return;
       }
@@ -121,7 +121,7 @@ export class GridCompute {
       if (rowPlacement.start > -1 && columnPlacement.start > -1) {
         for (let i = rowPlacement.start; i < rowPlacement.end; i++) {
           for (let j = columnPlacement.start; j < columnPlacement.end; j++) {
-            this.putNodeInCeil(i, j, node);
+            this.putNodeInCell(i, j, node);
             return;
           }
         }
@@ -172,7 +172,7 @@ export class GridCompute {
           for (let j = placement.start; j < placement.end; j++) {
             const rowIndex = isRow ? j : i;
             const columnIndex = isRow ? i : j;
-            this.putNodeInCeil(rowIndex, columnIndex, node);
+            this.putNodeInCell(rowIndex, columnIndex, node);
           }
           break;
         }
@@ -204,7 +204,7 @@ export class GridCompute {
     }
     for (let i = rowIndex; i < rowEnd; i++) {
       for (let j = columnIndex; j < columnEnd; j++) {
-        this.putNodeInCeil(i, j, node);
+        this.putNodeInCell(i, j, node);
       }
     }
     return true;

@@ -14,7 +14,7 @@ export class Composition {
     const grid = new GridCompute(this.container);
     const gridTemplateAreas = this.container.config.gridTemplateAreas;
     if (gridTemplateAreas) {
-      grid.fromAreas(<string[][]>gridTemplateAreas);
+      grid.setAreas(<string[][]>gridTemplateAreas);
     }
     const nodes = this.container.children;
     grid.putNodes(nodes);
