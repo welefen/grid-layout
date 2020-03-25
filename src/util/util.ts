@@ -76,3 +76,26 @@ export function parseNumberValue(value: string | number, parentValue?: number): 
   }
   return value;
 }
+
+export function parseMinMaxValue(value: number, min: number, max: number) {
+  if (min && value < min) {
+    value = min;
+  }
+  if (max && value > max) {
+    value = max;
+  }
+  return value;
+}
+
+export function parseCombineValue<T>(value: T | T[]) {
+  if (!Array.isArray(value)) {
+    value = [value, value, value, value];
+  } else if (value.length === 1) {
+    value = [value[0], value[0], value[0], value[0]];
+  } else if (value.length === 2) {
+    value = [value[0], value[1], value[0], value[1]];
+  } else if (value.length === 3) {
+    value[3] = value[1];
+  }
+  return value;
+}

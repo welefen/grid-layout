@@ -1,16 +1,12 @@
 import { NodeConfig, BorderProperty, BorderPaddingMarginProperty, GridLine, StringOrNumber, GridLineProperty, GridPlacement, BoundingRect, TrackType, GridCell } from './util/config';
 import { Container } from './container';
-import { parseNumberValue, parseMarginAuto } from './util/util';
+import { parseNumberValue, parseMarginAuto, parseMinMaxValue, parseCombineValue } from './util/util';
 
 let id = 1;
 export class Node {
   id: number = 1;
-  parent: Container | null;
+  parent: Container;
   config: NodeConfig;
-  minContentWidth: number;
-  minContentHeight: number;
-  maxContentWidth: number;
-  maxContentHeight: number;
   boundingRect: BoundingRect = {};
   cells: GridCell[] = []; // node in cells
   placement: GridPlacement = { // node placement with grid-row-start/grid-column-start
@@ -32,7 +28,6 @@ export class Node {
       }
     })
     this.parseSize();
-    this.parseContentSize();
   }
   private parseGridLine(property: GridLineProperty): void {
     const value = <StringOrNumber>this.config[property];
@@ -58,22 +53,10 @@ export class Node {
       this.config[property] = desc;
     }
   }
-  private parseCombineValue<T>(value: T | T[]) {
-    if (!Array.isArray(value)) {
-      value = [value, value, value, value];
-    } else if (value.length === 1) {
-      value = [value[0], value[0], value[0], value[0]];
-    } else if (value.length === 2) {
-      value = [value[0], value[1], value[0], value[1]];
-    } else if (value.length === 3) {
-      value[3] = value[1];
-    }
-    return value;
-  }
   private parseCombineProperty(property: BorderPaddingMarginProperty) {
     const pWidth = <number>this.parent.config.width;
     if (property === 'border' || property === 'padding' || property === 'margin') {
-      const values = <number[]>this.parseCombineValue(property).map(item => parseNumberValue(item, pWidth));
+      const values = <number[]>parseCombineValue(property).map(item => parseNumberValue(item, pWidth));
       const props = [`${property}Top`, `${property}Right`, `${property}Bottom`, `${property}Left`];
       props.forEach((item: BorderPaddingMarginProperty, index) => {
         this.config[item] = values[index];
@@ -98,8 +81,18 @@ export class Node {
     if (this.config.minHeight > this.config.maxHeight) {
       this.config.maxHeight = 0;
     }
+    this.boundingRect.width = this.getComputedWidth(this.config.minContentWidth);
+    this.boundingRect.height = this.getComputedHeight(this.config.minContentHeight);
   }
-  private parseLayoutWidth(width: number): number {
+  private getComputedWidth(width: number = 0): number {
+    width = <number>this.config.width || width || 0;
+    const minWidth = <number>this.config.minWidth;
+    let maxWidth = <number>this.config.maxWidth;
+    return parseMinMaxValue(width, minWidth, maxWidth);
+  }
+
+  private getLayoutWidth(width: number = 0): number {
+    width = this.getComputedWidth(width);
     const marginLeft = <number>parseMarginAuto(this.config.marginLeft);
     const marginRight = <number>parseMarginAuto(this.config.marginRight);
     width += marginLeft + marginRight;
@@ -111,7 +104,15 @@ export class Node {
     }
     return width;
   }
-  private parseLayoutHeight(height: number): number {
+  private getComputedHeight(height: number = 0): number {
+    height = <number>this.config.height || height || 0;
+    const minHeight = <number>this.config.minHeight;
+    let maxHeight = <number>this.config.maxHeight;
+    return parseMinMaxValue(height, minHeight, maxHeight);
+  }
+
+  private getLayoutHeight(height: number = 0): number {
+    height = this.getComputedHeight(height);
     const marginTop = <number>parseMarginAuto(this.config.marginTop);
     const marginBottom = <number>parseMarginAuto(this.config.marginBottom);
     height += marginTop + marginBottom;
@@ -123,48 +124,24 @@ export class Node {
     }
     return height;
   }
-  private parseMinMaxValue(value: number, min: number, max: number) {
-    if (min && value < min) {
-      value = min;
-    }
-    if (max && value > max) {
-      value = max;
-    }
-    return value;
+  get minContentWidth() {
+    return this.getLayoutWidth(this.config.minContentWidth);
   }
-  private parseComputedWidth(owidth?: number): number {
-    let width = <number>this.config.width || owidth || 0;
-    const minWidth = <number>this.config.minWidth;
-    let maxWidth = <number>this.config.maxWidth;
-    return this.parseMinMaxValue(width, minWidth, maxWidth);
+  get maxContentWidth() {
+    return this.getLayoutWidth(this.config.maxContentWidth);
   }
-  private parseContentWidth(owidth: number): number {
-    const width = this.parseComputedWidth(owidth);
-    return this.parseLayoutWidth(width);
+  get minContentHeight() {
+    return this.getLayoutHeight(this.config.minContentHeight);
   }
-  private parseComputedHeight(oheight?: number): number {
-    let height = <number>this.config.height || oheight || 0;
-    const minHeight = <number>this.config.minHeight;
-    let maxHeight = <number>this.config.maxHeight;
-    return this.parseMinMaxValue(height, minHeight, maxHeight);
+  get maxContentHeight() {
+    return this.getLayoutHeight(this.config.maxContentHeight);
   }
-  private parseContentHeight(oheight: number): number {
-    const height = this.parseComputedHeight(oheight);
-    return this.parseLayoutHeight(height);
-  }
-  private parseContentSize() {
-    this.minContentWidth = this.parseContentWidth(this.config.minContentWidth);
-    this.minContentHeight = this.parseContentHeight(this.config.minContentHeight);
-    this.maxContentWidth = this.parseContentWidth(this.config.maxContentWidth);
-    this.maxContentHeight = this.parseContentHeight(this.config.maxContentHeight);
-    this.boundingRect.width = this.parseComputedWidth(this.config.minContentWidth);
-    this.boundingRect.height = this.parseComputedHeight(this.config.minContentHeight);
-  }
+
   getFitContentWidth(value: number): number {
     let width = <number>this.config.width;
     const minWidth = <number>this.config.minWidth;
     let maxWidth = <number>this.config.maxWidth;
-    width = this.parseMinMaxValue(width, minWidth, maxWidth);
+    width = parseMinMaxValue(width, minWidth, maxWidth);
     if (width) {
       value = width;
     } else if (value > this.config.maxContentWidth) {
@@ -172,13 +149,13 @@ export class Node {
     } else if (this.config.minContentWidth > value) {
       value = this.config.minContentWidth;
     }
-    return this.parseLayoutWidth(value);
+    return this.getLayoutWidth(value);
   }
   getFitContentHeight(value: number): number {
     let height = <number>this.config.height;
     const minHeight = <number>this.config.minHeight;
     let maxHeight = <number>this.config.maxHeight;
-    height = this.parseMinMaxValue(height, minHeight, maxHeight);
+    height = parseMinMaxValue(height, minHeight, maxHeight);
     if (height) {
       value = height;
     } else if (value > this.config.maxContentHeight) {
@@ -186,7 +163,7 @@ export class Node {
     } else if (this.config.minContentHeight > value) {
       value = this.config.minContentHeight;
     }
-    return this.parseLayoutHeight(value);
+    return this.getLayoutHeight(value);
   }
   private parseAutoMargin(type: TrackType, boundingRect: BoundingRect): boolean {
     const isRow = type === 'row';
@@ -195,13 +172,14 @@ export class Node {
     const startAuto = marginStart === 'auto';
     const endAuto = marginEnd === 'auto';
     if (startAuto || endAuto) {
-      const sizeProp = isRow ? 'height' : 'width';
-      const size = Math.max(0, boundingRect[sizeProp] - this.boundingRect[sizeProp]);
+      const cellSize = isRow ? boundingRect.height : boundingRect.width;
+      const nodeSize = isRow ? this.getLayoutHeight() : this.getLayoutWidth();
+      const size = Math.max(0, cellSize - nodeSize);
       const prop = isRow ? 'top' : 'left';
       if (startAuto && endAuto) {
         this.boundingRect[prop] = boundingRect[prop] + size / 2;
       } else if (startAuto) {
-        this.boundingRect[prop] = boundingRect[prop] + size - <number>parseMarginAuto(marginEnd);
+        this.boundingRect[prop] = boundingRect[prop] + size;
       } else {
         this.boundingRect[prop] = boundingRect[prop] + <number>parseMarginAuto(marginStart);
       }
@@ -213,32 +191,31 @@ export class Node {
     const isRow = type === 'row';
     const prop = isRow ? 'top' : 'left';
     const sizeProp = isRow ? 'height' : 'width';
-    const size = boundingRect[sizeProp] - this.boundingRect[sizeProp];
+    const cellSize = isRow ? boundingRect.height : boundingRect.width;
+    const nodeSize = isRow ? this.getLayoutHeight() : this.getLayoutWidth();
+    const size = Math.max(0, cellSize - nodeSize);
     const marginStart = <number>parseMarginAuto(isRow ? this.config.marginTop : this.config.marginLeft);
-    const marginEnd = <number>parseMarginAuto(isRow ? this.config.marginBottom : this.config.marginRight);
     switch (align) {
       case 'start':
         this.boundingRect[prop] = boundingRect[prop] + marginStart;
         break;
       case 'center':
-        this.boundingRect[prop] = boundingRect[prop] + size / 2;
+        this.boundingRect[prop] = boundingRect[prop] + size / 2 + marginStart;
         break;
       case 'end':
-        console.log(boundingRect, prop, size, marginEnd)
-        this.boundingRect[prop] = boundingRect[prop] + size - marginEnd;
+        this.boundingRect[prop] = boundingRect[prop] + size + marginStart;
         break;
       case 'stretch':
         if (!this.config[sizeProp]) {
           const min = <number>(isRow ? this.config.minHeight : this.config.minWidth);
           const max = <number>(isRow ? this.config.maxHeight : this.config.maxWidth);
-          const value = this.parseMinMaxValue(boundingRect[sizeProp] - marginStart - marginEnd, min, max);
+          const marginEnd = <number>parseMarginAuto(isRow ? this.config.marginBottom : this.config.marginRight);
+          const value = parseMinMaxValue(boundingRect[sizeProp] - marginStart - marginEnd, min, max);
           if (value > this.boundingRect[sizeProp]) {
             this.boundingRect[sizeProp] = value;
           }
-          this.boundingRect[prop] = boundingRect[prop] + marginStart;
-        } else {
-          this.boundingRect[prop] = boundingRect[prop] + marginStart;
-        }
+        } 
+        this.boundingRect[prop] = boundingRect[prop] + marginStart;
         break;
     }
   }
