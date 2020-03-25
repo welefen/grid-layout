@@ -1,126 +1,241 @@
-import deepmerge from 'ts-deepmerge';
+import { TrackList, GridCell, TrackItem, TrackType } from '../util/config';
 import { Container } from '../container';
-import { TrackList, TrackItem, TrackType } from '../util/config';
-import { isFixedBreadth, isAutoRepeat, isFixedRepeat } from '../util/track';
+import { isAutoMinMaxTrack, isAutoTrack, isMinMaxTrack, isFrTrack, parseAlignSpace } from '../util/track';
 
 export class TrackCompute {
   trackList: TrackList;
+  cells: GridCell[][];
   container: Container;
   type: TrackType;
-  constructor(trackList: TrackList, container: Container, type: TrackType) {
+  containerSize: number;
+  freeSpace: number;
+  gap: number;
+  constructor(trackList: TrackList, cells: GridCell[][], container: Container, type: TrackType) {
     this.trackList = trackList;
+    this.cells = cells;
     this.container = container;
     this.type = type;
-    this.parseTrackList();
+    const config = this.container.config;
+    const gap = <number>(this.type === 'row' ? config.gridRowGap : config.gridColumnGap);
+    this.gap = gap;
+    this.containerSize = this.type === 'row' ? config.height : config.width;
+    this.freeSpace = this.containerSize - gap * (trackList.length - 1);
   }
-  /**
-   * expand fixed repeat to trackList
-   * @param track 
-   */
-  private expandFixedRepeat(track: TrackItem, num?: number): TrackList {
-    const repeatNum = <number>(num || track.args[0]);
-    const repeatValue = <TrackList>track.args[1];
-    const result: TrackList = [];
-    let i = 0;
-    while (i++ < repeatNum) {
-      const copy = deepmerge([], repeatValue);
-      result.push(...copy);
+  private parseTrackItemValue(track: TrackItem, index: number): number {
+    switch (track.type) {
+      case 'min-content':
+        return this.parseMinContent(index);
+      case 'max-content':
+        return this.parseMaxContent(index);
+      case 'fit-content':
+        return this.parseFitContent(track, index);
+      case '%':
+        return track.value * this.containerSize / 100;
+      case 'auto':
+        return this.parseMinContent(index);
+      case 'px':
+        return track.value;
     }
-    return result;
+    return -1;
   }
-  get size() {
-    return this.type === 'row' ? this.container.config.height : this.container.config.width;
-  }
-  get gap(): number {
-    return <number>(this.type === 'row' ? this.container.config.gridRowGap : this.container.config.gridColumnGap);
-  }
-  private getTrackItemValue(item: TrackItem): number {
-    if (item.type === 'px') return item.value;
-    if (item.type === 'minmax') {
-      const min = <TrackItem>item.args[0];
-      const max = <TrackItem>item.args[1];
-      return isFixedBreadth(min) ? min.value : max.value;
-    }
-    return 0;
-  }
-  private parseAutoRepeat() {
-    const gap = this.gap;
-    let size = 0;
-    let repeatTrack: TrackItem;
-    let repeatIndex: number;
-
-    this.trackList.forEach((item, index) => {
-      size += this.getTrackItemValue(item);
-      if (isAutoRepeat(item)) {
-        repeatTrack = item;
-        repeatIndex = index;
-      }
-    })
-    let leaveSpace = this.size - size;
-    let repeatSize = 0;
-    const repeatList = <TrackList>repeatTrack.args[1];
-    repeatList.forEach(item => {
-      repeatSize += this.getTrackItemValue(item);
-    });
-    let count = 1;
-    if (leaveSpace > repeatSize) {
-      count = Math.floor(leaveSpace / repeatSize);
-      if (gap) {
-        const fixLength = this.trackList.length - 1;
-        const repeatLength = repeatList.length;
-        while (count > 1) {
-          const gapSize = gap * (fixLength + repeatLength * count - 1);
-          if (leaveSpace - gapSize - count * repeatSize > 0) {
-            break;
-          } else {
-            count--;
-          }
+  private parseTrackSize() {
+    this.trackList.forEach((track, index) => {
+      if (isMinMaxTrack(track)) {
+        const min = <TrackItem>track.args[0];
+        const max = <TrackItem>track.args[1];
+        const minValue = this.parseTrackItemValue(min, index);
+        const maxValue = this.parseTrackItemValue(max, index);
+        track.baseSize = minValue;
+        if (maxValue > -1) {
+          track.growthLimit = maxValue;
+        }
+        if (track.growthLimit < track.baseSize) {
+          track.growthLimit = track.baseSize;
+        }
+      } else {
+        const value = this.parseTrackItemValue(track, index);
+        if (value > -1) {
+          track.baseSize = value;
         }
       }
-    }
-    const repeatResult = this.expandFixedRepeat(repeatTrack, count);
-    this.trackList.splice(repeatIndex, 1, ...repeatResult);
-  }
-  // merge lineNames
-  private mergeLineNames(): void {
-    const length = this.trackList.length;
-    for (let i = 0; i < length - 1; i++) {
-      const current = this.trackList[i];
-      const next = this.trackList[i + 1];
-      if (current.lineNamesEnd.length !== next.lineNamesStart.length) {
-        current.lineNamesEnd.push(...next.lineNamesStart);
-        next.lineNamesStart.push(...current.lineNamesEnd);
-      }
-    }
-  }
-  /**
-   * parse track list
-   * * convert percentage to value
-   * * parse fixed repeat
-   * * parse auto repeat
-   */
-  private parseTrackList() {
-    const result: TrackList = [];
-    let hasAutoRepeat = false;
-    const size = this.size;
-    this.trackList.forEach(item => {
-      if (item.type === '%') {
-        item.type = 'px';
-        item.value = item.value * size / 100;
-        item.baseSize = item.value;
-        item.growthLimit = item.value;
-      } else if (isFixedRepeat(item)) {
-        result.push(...this.expandFixedRepeat(item));
-        return;
-      } else if (isAutoRepeat(item)) {
-        hasAutoRepeat = true;
-      }
-      result.push(item);
     })
-    this.trackList = result;
-    if (hasAutoRepeat) {
-      this.parseAutoRepeat();
+  }
+  private getCeilItems(index: number): GridCell[] {
+    const items = this.type === 'row' ? this.cells[index] : this.cells.map(item => item[index]);
+    return (items || []).filter(item => {
+      return item && item.node.length === 1;
+    })
+  }
+  private parseMinContent(index: number): number {
+    const items = this.getCeilItems(index);
+    const size = items.map(item => {
+      const node = item.node[0];
+      return this.type === 'row' ? node.minContentHeight : node.minContentWidth;
+    });
+    return Math.max(...size);
+  }
+  private parseMaxContent(index: number): number {
+    const items = this.getCeilItems(index);
+    const size = items.map(item => {
+      const node = item.node[0];
+      return this.type === 'row' ? node.maxContentHeight : node.maxContentWidth;
+    });
+    return Math.max(...size);
+  }
+  private parseFitContent(track: TrackItem, index: number) {
+    const arg = <TrackItem>track.args[0];
+    if (arg.type === '%') {
+      const config = this.container.config;
+      arg.value *= (this.type === 'row' ? config.height : config.width) / 100;
     }
-    this.mergeLineNames();
+    const min = this.parseMinContent(index);
+    const max = this.parseMaxContent(index);
+    return Math.min(max, Math.max(min, arg.value));
+  }
+  private parseFrTrack() {
+    let frCount = 0;
+    let freeSpace = this.freeSpace;
+    this.trackList.forEach(track => {
+      if (isFrTrack(track)) {
+        frCount += track.value;
+      } else if (isMinMaxTrack(track)) {
+        const max = <TrackItem>track.args[1];
+        if (isFrTrack(max)) {
+          frCount += max.value;
+        } else if (isAutoTrack(max)) {
+          freeSpace -= track.baseSize;
+        } else {
+          freeSpace -= track.growthLimit;
+        }
+      } else {
+        freeSpace -= track.baseSize;
+      }
+    })
+    if (!frCount) return;
+    while (true) {
+      const itemSpace = Math.max(0, freeSpace) / frCount;
+      let flag = false;
+      this.trackList.forEach((track, index) => {
+        if (isFrTrack(track)) {
+          const space = track.value * itemSpace;
+          const minSpace = this.parseMinContent(index);
+          if (space < minSpace) {
+            freeSpace -= minSpace;
+            track.baseSize = minSpace;
+            track.growthLimit = track.baseSize;
+            track.type = 'px';
+            flag = true;
+          }
+        }
+      })
+      if (!flag) {
+        this.trackList.forEach((track, index) => {
+          if (isFrTrack(track)) {
+            track.baseSize = track.value * itemSpace;
+            track.type = 'px';
+          } else if (isMinMaxTrack(track)) {
+            const max = <TrackItem>track.args[1];
+            if (isFrTrack(max)) {
+              const space = max.value * itemSpace;
+              max.value = space;
+              max.type = 'px';
+              track.growthLimit = space;
+              if (track.growthLimit < track.baseSize) {
+                track.growthLimit = track.baseSize;
+              }
+            }
+          }
+        })
+        break;
+      }
+    }
+  }
+  private parseMinMaxTrack() {
+    let freeSpace = this.freeSpace;
+    let minmaxCount = 0;
+    this.trackList.forEach(track => {
+      freeSpace -= track.baseSize;
+      if (isMinMaxTrack(track)) {
+        const max = <TrackItem>track.args[1];
+        if (!isAutoTrack(max)) {
+          minmaxCount++;
+        }
+      }
+    })
+    if (!minmaxCount || freeSpace < 0) return;
+    while (true) {
+      const itemSpace = freeSpace / minmaxCount;
+      let flag = false;
+      this.trackList.forEach(track => {
+        if (isMinMaxTrack(track)) {
+          const max = <TrackItem>track.args[1];
+          if (!isAutoTrack(max) && track.growthLimit < track.baseSize + itemSpace) {
+            track.baseSize = track.growthLimit;
+            freeSpace -= track.growthLimit - track.baseSize;
+            minmaxCount--;
+            flag = true;
+          }
+
+        }
+      })
+      if (!flag) {
+        this.trackList.forEach(track => {
+          if (isMinMaxTrack(track)) {
+            const max = <TrackItem>track.args[1];
+            if (!isAutoTrack(max) && track.growthLimit > track.baseSize) {
+              track.baseSize += itemSpace;
+            }
+          }
+        })
+        break;
+      }
+    }
+  }
+  private parseAutoTrack() {
+    const config = this.container.config;
+    if (this.type === 'column' && config.justifyContent !== 'stretch') return;
+    if (this.type === 'row' && config.alignContent !== 'stretch') return;
+    let freeSpace = this.freeSpace;
+    let autoCount = 0;
+    this.trackList.forEach(track => {
+      freeSpace -= track.baseSize;
+      if (isAutoTrack(track) || isAutoMinMaxTrack(track)) {
+        autoCount++;
+      }
+    })
+    if (!autoCount || freeSpace < 0) return;
+    let itemSpace = Math.round(freeSpace / autoCount);
+    let count = 0;
+    this.trackList.forEach(track => {
+      if (isAutoTrack(track) || isAutoMinMaxTrack(track)) {
+        // fix last item space
+        if (count === autoCount - 1) {
+          itemSpace = freeSpace - itemSpace * count;
+        }
+        track.baseSize += itemSpace;
+        count++;
+      }
+    })
+  }
+  private parseTrackPosition() {
+    let freeSpace = this.freeSpace;
+    this.trackList.forEach(track => {
+      freeSpace -= track.baseSize;
+    })
+    const config = this.container.config;
+    const type = this.type === 'row' ? config.alignContent : config.justifyContent;
+    const marginSize = parseAlignSpace(freeSpace, type, this.trackList.length);
+    let pos = 0;
+    this.trackList.forEach((track, index) => {
+      track.pos = pos + marginSize[index];
+      pos = track.pos + track.baseSize + this.gap;
+    })
+  }
+  public parse() {
+    this.parseTrackSize();
+    this.parseFrTrack();
+    this.parseMinMaxTrack();
+    this.parseAutoTrack();
+    this.parseTrackPosition();
   }
 }

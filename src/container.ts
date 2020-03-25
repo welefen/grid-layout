@@ -1,7 +1,7 @@
 import { Node } from './node';
 import { ContainerConfig, TrackSizeProperty, GridAutoFlow, BoundingRect } from './util/config';
 import { TrackParser } from './parser/track';
-import { TrackCompute } from './compute/track';
+import { RepeatTrackCompute } from './compute/repeatTrack';
 import { AreaParser } from './parser/area';
 import { Composition } from './compute/composition';
 
@@ -34,9 +34,11 @@ export class Container {
   private parse() {
     this.parseOrder(this.children);
     ['gridTemplateRows', 'gridTemplateColumns', 'gridAutoRows', 'gridAutoColumns'].forEach(item => {
-      const instance = new TrackParser(<string>this.config[<TrackSizeProperty>item]);
+      const parser = new TrackParser(<string>this.config[<TrackSizeProperty>item]);
+      parser.parse();
       const type = item.includes('Rows') ? 'row' : 'column';
-      const compute = new TrackCompute(instance.parse(), this, type);
+      const compute = new RepeatTrackCompute(parser.trackList, this, type);
+      compute.parse();
       this.config[<TrackSizeProperty>item] = compute.trackList;
     });
     // parse grid-auto-flow

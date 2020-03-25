@@ -6,13 +6,17 @@ import { isFixedBreadth, isInflexibleBreadth, isTrackBreadth } from '../util/tra
 type conditionChecker = (val: string) => boolean;
 
 export class TrackParser extends Parser {
-  parse(): TrackList {
+  trackList: TrackList;
+  /**
+   * parse track list
+   */
+  parse() {
     const instance = new TrackTokenizer(this.text);
     this.tokens = instance.getTokens();
     this.length = this.tokens.length;
     const result = this.parseCondition(_ => true, ['minmax', 'fit-content', 'repeat']);
     this.checkTrack(result);
-    return result;
+    this.trackList = result;
   }
   parseValue(value: string): TrackItem {
     if (value === 'auto' || value === 'min-content' || value === 'max-content') {
