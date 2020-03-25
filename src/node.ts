@@ -1,5 +1,6 @@
 import { NodeConfig, BorderProperty, BorderPaddingMarginProperty, GridLine, StringOrNumber, GridLineProperty, GridPlacement, BoundingRect, TrackType, GridCell } from './util/config';
 import { Container } from './container';
+import { parseNumberValue, parseMarginAuto } from './util/util';
 
 let id = 1;
 export class Node {
@@ -57,14 +58,6 @@ export class Node {
       this.config[property] = desc;
     }
   }
-  private parsePercentValue(value: string): false | number {
-    if (!/%$/.test(value)) return false;
-    return 0.01 * parseFloat(value);
-  }
-  private parseMarginAuto(value: string | number, autoValue = 0) {
-    if (value === 'auto') return autoValue;
-    return value || 0;
-  }
   private parseCombineValue<T>(value: T | T[]) {
     if (!Array.isArray(value)) {
       value = [value, value, value, value];
@@ -77,51 +70,38 @@ export class Node {
     }
     return value;
   }
-  private parseNumberValue(value: string | number, parentValue?: number): string | number {
-    if (value === 'auto' || typeof value === 'number') return value;
-    if (!value) return 0;
-    const percentValue = this.parsePercentValue(value);
-    if (typeof percentValue === 'number') {
-      value = percentValue * parentValue;
-    } else if (/^[\d.-]+$/.test(value)) {
-      value = parseFloat(value);
-    } else {
-      throw new Error(`${value} is not a number`);
-    }
-    return value;
-  }
   private parseCombineProperty(property: BorderPaddingMarginProperty) {
     const pWidth = <number>this.parent.config.width;
     if (property === 'border' || property === 'padding' || property === 'margin') {
-      const values = <number[]>this.parseCombineValue(property).map(item => this.parseNumberValue(item, pWidth));
+      const values = <number[]>this.parseCombineValue(property).map(item => parseNumberValue(item, pWidth));
       const props = [`${property}Top`, `${property}Right`, `${property}Bottom`, `${property}Left`];
       props.forEach((item: BorderPaddingMarginProperty, index) => {
         this.config[item] = values[index];
       })
     } else {
-      this.config[property] = this.parseNumberValue(this.config[property], pWidth);
+      this.config[property] = parseNumberValue(this.config[property], pWidth);
     }
   }
   private parseSize() {
     const pWidth = this.parent.config.width;
-    this.config.width = this.parseNumberValue(this.config.width, pWidth);
-    this.config.minWidth = this.parseNumberValue(this.config.minWidth, pWidth);
-    this.config.maxWidth = this.parseNumberValue(this.config.maxWidth, pWidth);
+    this.config.width = parseNumberValue(this.config.width, pWidth);
+    this.config.minWidth = parseNumberValue(this.config.minWidth, pWidth);
+    this.config.maxWidth = parseNumberValue(this.config.maxWidth, pWidth);
     if (this.config.minWidth > this.config.maxWidth) {
       this.config.maxWidth = 0;
     }
 
     const pHeight = this.parent.config.height;
-    this.config.height = this.parseNumberValue(this.config.height, pHeight);
-    this.config.minHeight = this.parseNumberValue(this.config.minHeight, pHeight);
-    this.config.maxHeight = this.parseNumberValue(this.config.maxHeight, pHeight);
+    this.config.height = parseNumberValue(this.config.height, pHeight);
+    this.config.minHeight = parseNumberValue(this.config.minHeight, pHeight);
+    this.config.maxHeight = parseNumberValue(this.config.maxHeight, pHeight);
     if (this.config.minHeight > this.config.maxHeight) {
       this.config.maxHeight = 0;
     }
   }
   private parseLayoutWidth(width: number): number {
-    const marginLeft = <number>this.parseMarginAuto(this.config.marginLeft);
-    const marginRight = <number>this.parseMarginAuto(this.config.marginRight);
+    const marginLeft = <number>parseMarginAuto(this.config.marginLeft);
+    const marginRight = <number>parseMarginAuto(this.config.marginRight);
     width += marginLeft + marginRight;
     if (this.config.boxSizing !== 'border-box') {
       const props = ['borderLeft', 'borderRight', 'paddingLeft', 'paddingRight'];
@@ -132,8 +112,8 @@ export class Node {
     return width;
   }
   private parseLayoutHeight(height: number): number {
-    const marginTop = <number>this.parseMarginAuto(this.config.marginTop);
-    const marginBottom = <number>this.parseMarginAuto(this.config.marginBottom);
+    const marginTop = <number>parseMarginAuto(this.config.marginTop);
+    const marginBottom = <number>parseMarginAuto(this.config.marginBottom);
     height += marginTop + marginBottom;
     if (this.config.boxSizing !== 'border-box') {
       const props = ['borderTop', 'borderBottom', 'paddingTop', 'paddingBottom'];
@@ -215,18 +195,15 @@ export class Node {
     const startAuto = marginStart === 'auto';
     const endAuto = marginEnd === 'auto';
     if (startAuto || endAuto) {
-      const size = isRow ? (boundingRect.height - this.boundingRect.height) : (boundingRect.width - this.boundingRect.width);
+      const sizeProp = isRow ? 'height' : 'width';
+      const size = Math.max(0, boundingRect[sizeProp] - this.boundingRect[sizeProp]);
       const prop = isRow ? 'top' : 'left';
-      if (size > 0) {
-        if (startAuto && endAuto) {
-          this.boundingRect[prop] = boundingRect[prop] + size / 2;
-        } else if (startAuto) {
-          this.boundingRect[prop] = boundingRect[prop] + size;
-        } else {
-          this.boundingRect[prop] = boundingRect[prop];
-        }
+      if (startAuto && endAuto) {
+        this.boundingRect[prop] = boundingRect[prop] + size / 2;
+      } else if (startAuto) {
+        this.boundingRect[prop] = boundingRect[prop] + size - <number>parseMarginAuto(marginEnd);
       } else {
-        this.boundingRect[prop] = boundingRect[prop];
+        this.boundingRect[prop] = boundingRect[prop] + <number>parseMarginAuto(marginStart);
       }
       return true;
     }
@@ -237,27 +214,30 @@ export class Node {
     const prop = isRow ? 'top' : 'left';
     const sizeProp = isRow ? 'height' : 'width';
     const size = boundingRect[sizeProp] - this.boundingRect[sizeProp];
+    const marginStart = <number>parseMarginAuto(isRow ? this.config.marginTop : this.config.marginLeft);
+    const marginEnd = <number>parseMarginAuto(isRow ? this.config.marginBottom : this.config.marginRight);
     switch (align) {
       case 'start':
-        this.boundingRect[prop] = boundingRect[prop];
+        this.boundingRect[prop] = boundingRect[prop] + marginStart;
         break;
       case 'center':
         this.boundingRect[prop] = boundingRect[prop] + size / 2;
         break;
       case 'end':
-        this.boundingRect[prop] = boundingRect[prop] + size;
+        console.log(boundingRect, prop, size, marginEnd)
+        this.boundingRect[prop] = boundingRect[prop] + size - marginEnd;
         break;
       case 'stretch':
         if (!this.config[sizeProp]) {
           const min = <number>(isRow ? this.config.minHeight : this.config.minWidth);
           const max = <number>(isRow ? this.config.maxHeight : this.config.maxWidth);
-          const value = this.parseMinMaxValue(size + this.boundingRect[sizeProp], min, max);
+          const value = this.parseMinMaxValue(boundingRect[sizeProp] - marginStart - marginEnd, min, max);
           if (value > this.boundingRect[sizeProp]) {
             this.boundingRect[sizeProp] = value;
           }
-          this.boundingRect[prop] = boundingRect[prop];
+          this.boundingRect[prop] = boundingRect[prop] + marginStart;
         } else {
-          this.boundingRect[prop] = boundingRect[prop];
+          this.boundingRect[prop] = boundingRect[prop] + marginStart;
         }
         break;
     }

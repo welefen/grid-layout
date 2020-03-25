@@ -49,6 +49,11 @@ module.exports = class extends Base {
         'borderTop', 'borderRight', 'borderBottom', 'borderLeft', 'boxSizing'
       ];
       const layout = containerNode.getAllComputedLayout(props);
+      containerNode.children.forEach((node, index) => {
+        props.forEach(prop => {
+          layout.children[index][prop] = node.config[prop];
+        })
+      })
       return this.success(layout);
     } catch (e) {
       console.log(e)

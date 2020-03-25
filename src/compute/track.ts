@@ -1,6 +1,7 @@
 import { TrackList, GridCell, TrackItem, TrackType } from '../util/config';
 import { Container } from '../container';
-import { isAutoMinMaxTrack, isAutoTrack, isMinMaxTrack, isFrTrack, parseAlignSpace } from '../util/track';
+import { isAutoMinMaxTrack, isAutoTrack, isMinMaxTrack, isFrTrack } from '../util/track';
+import { parseAlignSpace } from '../util/util';
 
 export class TrackCompute {
   trackList: TrackList;
