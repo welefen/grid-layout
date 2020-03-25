@@ -2,15 +2,14 @@
   <div style="padding: 20px;padding-left:0">
     <el-form ref="form" :model="form" label-width="110px">
       <div v-if="type === 'container'">
-        <el-form-item label="direction">
+        <!-- <el-form-item label="direction">
           <el-select v-model="gridContainer.direction" placeholder="direction" @change="changeProperty('direction', $event)">
             <el-option label="ltr" value="ltr">ltr</el-option>
             <el-option label="rtl" value="rtl">rtl</el-option>
           </el-select>
-        </el-form-item>
+        </el-form-item> -->
          <el-form-item label="grid-auto-flow">
           <el-select v-model="gridContainer.gridAutoFlow" placeholder="gridAutoFlow" @change="changeProperty('gridAutoFlow', $event)">
-            <el-option label="" value=""></el-option>
             <el-option label="row" value="row">row</el-option>
             <el-option label="row dense" value="row dense">row dense</el-option>
             <el-option label="column" value="column">column</el-option>
@@ -219,7 +218,7 @@
 import event from './event.js';
 const gridContainer = {
   gridDirection: 'ltr',
-  gridAutoFlow: '',
+  gridAutoFlow: 'row',
   gridTemplateRows: '',
   gridTemplateColumns: '',
   gridTemplateAreas: '',
