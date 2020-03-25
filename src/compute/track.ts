@@ -37,8 +37,8 @@ export class TrackCompute {
   private getTrackItemValue(item: TrackItem): number {
     if (item.type === '') return item.value;
     if (item.type === 'minmax') {
-      const min = item.args[0] as TrackItem;
-      const max = item.args[1] as TrackItem;
+      const min = <TrackItem>item.args[0];
+      const max = <TrackItem>item.args[1];
       return isFixedBreadth(min) ? min.value : max.value;
     }
     return 0;
@@ -58,7 +58,7 @@ export class TrackCompute {
     })
     let leaveSpace = this.size - size;
     let repeatSize = 0;
-    const repeatList = repeatTrack.args[1] as TrackList;
+    const repeatList = <TrackList>repeatTrack.args[1];
     repeatList.forEach(item => {
       repeatSize += this.getTrackItemValue(item);
     });

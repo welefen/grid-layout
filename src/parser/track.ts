@@ -79,6 +79,10 @@ export class TrackParser extends Parser {
     }
     return lineNames;
   }
+  /**
+   * parse repealt num in repeat(xxx, yyyy)
+   * @param val 
+   */
   parseRepeatNum(val: string): number | 'auto-fill' | 'auto-fit' {
     if (val === 'auto-fill' || val === 'auto-fit') return val;
     if (/^\d+$/.test(val)) {
@@ -90,6 +94,9 @@ export class TrackParser extends Parser {
     }
     throw new Error(`${val} is not allowed`);
   }
+  /**
+   * parse repeat track
+   */
   parseRepeat(): TrackItem {
     this.nextNeed('(');
     const repeatNum = this.parseRepeatNum(this.peek());
@@ -153,8 +160,8 @@ export class TrackParser extends Parser {
       const type = item.type;
       if (type === '' || type === '%') return;
       if (type === 'minmax') {
-        const arg0 = item.args[0] as TrackItem;
-        const arg1 = item.args[1] as TrackItem;
+        const arg0 = <TrackItem>item.args[0];
+        const arg1 = <TrackItem>item.args[1];
         if (isFixedBreadth(arg0) && isTrackBreadth(arg1)) return;
         if (isInflexibleBreadth(arg0) && isFixedBreadth(arg1)) return;
       }
@@ -170,7 +177,7 @@ export class TrackParser extends Parser {
         case 'auto-fit-repeat':
         case 'auto-fill-repeat':
           autoRepeat++;
-          this.checkAutoRepeatTrack(item.args[1] as TrackList);
+          this.checkAutoRepeatTrack(<TrackList>item.args[1]);
           break;
         case 'auto':
         case 'fit-content':
