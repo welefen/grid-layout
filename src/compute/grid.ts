@@ -61,9 +61,9 @@ export class GridCompute {
   putNodeInCell(row: number, column: number, node: Node): void {
     if (!this.cells[row]) {
       this.cells[row] = [];
-      this.flexTrackSize('row', row);
+      this.flexTrackSize('row', row + 1);
     }
-    this.flexTrackSize('column', column);
+    this.flexTrackSize('column', column + 1);
     if (!this.cells[row][column]) {
       this.cells[row][column] = this.getInitCell(row, column);
     }
@@ -128,8 +128,8 @@ export class GridCompute {
       }
       node.placement = { row: rowPlacement, column: columnPlacement };
       if (rowPlacement.start > -1) {
-        this.flexTrackSize('row', rowPlacement.end + 1);
-        // autoflow is row
+        this.flexTrackSize('row', rowPlacement.end);
+        // auto-flow is row
         if (!this.autoFlow.column) {
           givedNodes.push(node);
           return;
@@ -137,7 +137,7 @@ export class GridCompute {
       }
       if (columnPlacement.start > -1) {
         this.flexTrackSize('column', columnPlacement.end);
-        // autoflow is column
+        // auto-flow is column
         if (this.autoFlow.column) {
           givedNodes.push(node);
           return;
@@ -163,7 +163,7 @@ export class GridCompute {
         for (let j = placement.start; j < placement.end; j++) {
           const rowIndex = isRow ? j : i;
           const columnIndex = isRow ? i : j;
-          if (this.cells[rowIndex] && this.cells[rowIndex][columnIndex] && this.cells[rowIndex][columnIndex]) {
+          if (this.cells[rowIndex] && this.cells[rowIndex][columnIndex] && this.cells[rowIndex][columnIndex].node.length) {
             empty = false;
             break;
           }
@@ -191,10 +191,10 @@ export class GridCompute {
    */
   private tryToSetNode(node: Node, rowIndex: number, columnIndex: number) {
     const { row, column } = node.placement;
-    if (row.start > - 1 && row.start !== rowIndex) return false;
+    if (row.start > -1 && row.start !== rowIndex) return false;
     if (column.start > -1 && column.start !== columnIndex) return false;
     const rowEnd = row.end === -1 ? rowIndex + 1 : row.end;
-    const columnEnd = column.end === - 1 ? columnIndex + 1 : column.end;
+    const columnEnd = column.end === -1 ? columnIndex + 1 : column.end;
     for (let i = rowIndex; i < rowEnd; i++) {
       for (let j = columnIndex; j < columnEnd; j++) {
         if (this.cells[i] && this.cells[i][j] && this.cells[i][j].node.length) {
@@ -286,7 +286,7 @@ export class GridCompute {
   private parseGridPlacement(track: TrackList, start?: GridLine, end?: GridLine) {
     let startIndex = -1;
     let endIndex = -1;
-    if (start) {
+    if (start && Object.keys(start).length > 0) {
       if (start.span) {
         if (!end) throw new Error('end must be set');
         if (end.span) throw new Error('end can not have span');
@@ -330,7 +330,7 @@ export class GridCompute {
         }
       }
     } else {
-      if (end) {
+      if (end && Object.keys(end).length > 0) {
         if (end.span) throw new Error('end has span');
         if (end.customIndent) {
           endIndex = this.findPositionByCustomIndent(track, end, 'end');
