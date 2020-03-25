@@ -153,7 +153,7 @@ export class Node {
     return value;
   }
   private parseComputedWidth(owidth?: number): number {
-    let width = <number>this.config.width || owidth;
+    let width = <number>this.config.width || owidth || 0;
     const minWidth = <number>this.config.minWidth;
     let maxWidth = <number>this.config.maxWidth;
     return this.parseMinMaxValue(width, minWidth, maxWidth);
@@ -163,7 +163,7 @@ export class Node {
     return this.parseLayoutWidth(width);
   }
   private parseComputedHeight(oheight?: number): number {
-    let height = <number>this.config.height || oheight;
+    let height = <number>this.config.height || oheight || 0;
     const minHeight = <number>this.config.minHeight;
     let maxHeight = <number>this.config.maxHeight;
     return this.parseMinMaxValue(height, minHeight, maxHeight);

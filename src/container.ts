@@ -66,6 +66,12 @@ export class Container {
     if (typeof this.config.gridColumnGap === 'string') {
       this.config.gridColumnGap = parseFloat(this.config.gridColumnGap) || 0;
     }
+    if (!this.config.justifyContent) {
+      this.config.justifyContent = 'stretch';
+    }
+    if (!this.config.alignContent) {
+      this.config.alignContent = 'stretch';
+    }
   }
   public calculateLayout() {
     this.parse();
