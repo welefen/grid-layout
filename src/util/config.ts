@@ -67,7 +67,7 @@ export type BorderPaddingMarginProperty = BorderProperty | PaddingProperty | Mar
 export type TrackType = 'row' | 'column';
 
 export interface TrackItem {
-  type: string; // auto/%/fr/min-content/max-content/fit-content/minmax/repeat/
+  type: string; // px/auto/%/fr/min-content/max-content/fit-content/minmax/repeat/
   value?: number;
   args?: Array<number | string | TrackItem | TrackList>;
   baseSize?: number;

@@ -1,7 +1,7 @@
 import { TrackItem } from './config';
 
 export function isFixedBreadth(value: TrackItem): boolean {
-  return !value.type || value.type === '%';
+  return value.type === 'px' || value.type === '%';
 }
 
 export function isInflexibleBreadth(value: TrackItem): boolean {

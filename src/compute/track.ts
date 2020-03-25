@@ -35,7 +35,7 @@ export class TrackCompute {
     return <number>(this.type === 'row' ? this.container.config.gridRowGap : this.container.config.gridColumnGap);
   }
   private getTrackItemValue(item: TrackItem): number {
-    if (item.type === '') return item.value;
+    if (item.type === 'px') return item.value;
     if (item.type === 'minmax') {
       const min = <TrackItem>item.args[0];
       const max = <TrackItem>item.args[1];
@@ -105,7 +105,7 @@ export class TrackCompute {
     const size = this.size;
     this.trackList.forEach(item => {
       if (item.type === '%') {
-        item.type = '';
+        item.type = 'px';
         item.value = item.value * size / 100;
         item.baseSize = item.value;
         item.growthLimit = item.value;

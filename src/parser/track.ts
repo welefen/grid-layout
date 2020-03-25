@@ -23,7 +23,7 @@ export class TrackParser extends Parser {
     if (match) {
       const val = parseFloat(match[1]);
       if (!match[2] || match[2] === 'px') {
-        return { value: val, type: '', baseSize: val, growthLimit: val };
+        return { value: val, type: 'px', baseSize: val, growthLimit: val };
       }
       if (match[2] === '%') {
         return { value: val, type: '%' };
@@ -144,13 +144,13 @@ export class TrackParser extends Parser {
         value = this.parseValue(item);
       }
       value.lineNamesStart = lineNames;
-      if(tracks.length) {
+      if (tracks.length) {
         tracks[tracks.length - 1].lineNamesEnd = lineNames.slice();
       }
       lineNames = [];
       tracks.push(value);
     }
-    if(lineNames.length) {
+    if (lineNames.length) {
       tracks[tracks.length - 1].lineNamesEnd = lineNames
     }
     return tracks;
@@ -158,7 +158,7 @@ export class TrackParser extends Parser {
   checkAutoRepeatTrack(list: TrackList) {
     list.forEach(item => {
       const type = item.type;
-      if (type === '' || type === '%') return;
+      if (type === 'px' || type === '%') return;
       if (type === 'minmax') {
         const arg0 = <TrackItem>item.args[0];
         const arg1 = <TrackItem>item.args[1];

@@ -33,7 +33,7 @@ export class TrackSizeCompute {
         return track.value * this.containerSize / 100;
       case 'auto':
         return this.parseMinContent(index);
-      case '':
+      case 'px':
         return track.value;
     }
     return -1;
@@ -123,7 +123,7 @@ export class TrackSizeCompute {
             freeSpace -= minSpace;
             track.baseSize = minSpace;
             track.growthLimit = track.baseSize;
-            track.type = '';
+            track.type = 'px';
             flag = true;
           }
         }
@@ -132,13 +132,13 @@ export class TrackSizeCompute {
         this.trackList.forEach((track, index) => {
           if (isFrTrack(track)) {
             track.baseSize = track.value * itemSpace;
-            track.type = '';
+            track.type = 'px';
           } else if (isMinMaxTrack(track)) {
             const max = <TrackItem>track.args[1];
             if (isFrTrack(max)) {
               const space = max.value * itemSpace;
               max.value = space;
-              max.type = '';
+              max.type = 'px';
               track.growthLimit = space;
               if (track.growthLimit < track.baseSize) {
                 track.growthLimit = track.baseSize;
