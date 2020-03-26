@@ -85,7 +85,9 @@ export class RepeatTrackCompute {
     const repeatResult = this.expandFixedRepeat(repeatTrack, count);
     this.trackList.splice(repeatIndex, 1, ...repeatResult);
   }
-  // merge lineNames
+  /**
+   * merge lineNames, lineNamesEnd equal to net lineNamesStart
+   */
   private mergeLineNames(): void {
     const length = this.trackList.length;
     for (let i = 0; i < length - 1; i++) {

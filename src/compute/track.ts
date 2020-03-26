@@ -139,6 +139,7 @@ export class TrackCompute {
       }
     })
     if (!frCount) return;
+    frCount = Math.max(1, frCount);
     while (true) {
       const itemSpace = Math.max(0, freeSpace) / frCount;
       let flag = false;
