@@ -77,12 +77,12 @@
             <el-option label="end" value="end"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="width">
+        <!-- <el-form-item label="width">
           <el-input v-model="gridContainer.width" type="text" @change="changeProperty('width', $event)"></el-input>
         </el-form-item>
         <el-form-item label="height">
           <el-input v-model="gridContainer.height" type="text" @change="changeProperty('height', $event)"></el-input>
-        </el-form-item>
+        </el-form-item> -->
       </div>
       <div v-if="type === 'item'">
         <el-form-item label="align-self">
