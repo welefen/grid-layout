@@ -91,10 +91,10 @@ export class RepeatTrackCompute {
     for (let i = 0; i < length - 1; i++) {
       const current = this.trackList[i];
       const next = this.trackList[i + 1];
-      if (current.lineNamesEnd.length !== next.lineNamesStart.length) {
-        current.lineNamesEnd.push(...next.lineNamesStart);
-        next.lineNamesStart.push(...current.lineNamesEnd);
-      }
+      const lineNames = current.lineNamesEnd.concat(next.lineNamesStart);
+      const set = new Set(lineNames);
+      current.lineNamesEnd = [...set];
+      next.lineNamesStart = [...set];
     }
   }
   /**
