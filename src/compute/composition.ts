@@ -22,7 +22,7 @@ export class Composition {
     this.rowTrack = grid.rowTrack;
     this.columnTrack = grid.columnTrack;
   }
-  parseCeilSize() {
+  parseCellSize() {
     this.cells.forEach((lines: GridCell[], rowIndex: number) => {
       lines.forEach((item: GridCell, columnIndex: number) => {
         item.width = this.columnTrack[columnIndex].baseSize;
@@ -55,7 +55,7 @@ export class Composition {
     rowInstance.parse();
     const columnInstane = new TrackCompute(this.columnTrack, this.cells, this.container, 'column');
     columnInstane.parse();
-    this.parseCeilSize();
+    this.parseCellSize();
     this.parseNodeSize();
   }
 }
