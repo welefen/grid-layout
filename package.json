@@ -1,7 +1,7 @@
 {
   "name": "grid-layout",
   "version": "1.0.0",
-  "description": "CSS Grid Layout, can use in Canvas",
+  "description": "CSS Grid Layout, can use in Canvas/node-canvas",
   "main": "index.js",
   "directories": {
     "test": "test"
@@ -35,7 +35,6 @@
     "typescript": "^3.6.4"
   },
   "dependencies": {
-    "deepmerge": "^4.2.2",
     "ts-deepmerge": "^1.0.2"
   }
 }
