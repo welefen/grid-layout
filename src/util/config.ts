@@ -3,8 +3,15 @@ import { Node } from '../node';
 type SelfAlignment = 'stretch' | 'center' | 'start' | 'end' | 'auto';
 type ContentAlignment = 'stretch' | 'start' | 'center' | 'end' | 'space-between' | 'space-around' | 'space-evenly';
 
-
+export type GridLineProperty = 'gridRowStart' | 'gridRowEnd' | 'gridColumnStart' | 'gridColumnEnd';
+export type TrackSizeProperty = 'gridTemplateRows' | 'gridTemplateColumns' | 'gridAutoRows' | 'gridAutoColumns';
 export type StringOrNumber = string | number;
+export type BorderProperty = 'border' | 'borderTop' | 'borderRight' | 'borderBottom' | 'borderLeft';
+export type PaddingProperty= 'padding' | 'paddingTop' | 'paddingRight' | 'paddingBottom' | 'paddingLeft';
+export type MarginProperty = 'margin' | 'marginTop' | 'marginRight' | 'marginBottom' | 'marginLeft';
+export type BorderPaddingMarginProperty = BorderProperty | PaddingProperty | MarginProperty;
+export type TrackType = 'row' | 'column';
+export type TrackList = TrackItem[];
 
 export interface ContainerConfig {
   gridAutoFlow?: string | GridAutoFlow;
@@ -59,12 +66,6 @@ export interface NodeConfig {
   maxContentWidth?: number;
   maxContentHeight?: number;
 }
-export type BorderProperty = 'border' | 'borderTop' | 'borderRight' | 'borderBottom' | 'borderLeft';
-export type PaddingProperty= 'padding' | 'paddingTop' | 'paddingRight' | 'paddingBottom' | 'paddingLeft';
-export type MarginProperty = 'margin' | 'marginTop' | 'marginRight' | 'marginBottom' | 'marginLeft';
-export type BorderPaddingMarginProperty = BorderProperty | PaddingProperty | MarginProperty;
-
-export type TrackType = 'row' | 'column';
 
 export interface TrackItem {
   type: string; // px/%/auto/fr/min-content/max-content/fit-content/minmax/repeat
@@ -78,7 +79,6 @@ export interface TrackItem {
   pos?: number; // track position
 }
 
-export type TrackList = TrackItem[];
 
 
 export interface BoundingRect {
@@ -95,10 +95,6 @@ export interface GridCell extends BoundingRect {
   name?: string; // cell name
   node: Node[]; // nodes in grid
 }
-
-export type GridLineProperty = 'gridRowStart' | 'gridRowEnd' | 'gridColumnStart' | 'gridColumnEnd';
-
-export type TrackSizeProperty = 'gridTemplateRows' | 'gridTemplateColumns' | 'gridAutoRows' | 'gridAutoColumns';
 
 /**
  * grid line define for grid-column-start/end, grid-row-start/end
