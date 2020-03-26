@@ -22,8 +22,9 @@ export class RepeatTrackCompute {
     const result: TrackList = [];
     let i = 0;
     while (i++ < repeatNum) {
-      const copy = deepmerge([], repeatValue);
-      result.push(...copy);
+      repeatValue.forEach(item => {
+        result.push(deepmerge({}, item));
+      })
     }
     return result;
   }

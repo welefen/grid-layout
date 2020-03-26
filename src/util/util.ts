@@ -43,10 +43,6 @@ export function parseAlignSpace(space: number, type: string, num: number) {
   } else if (type === 'space-evenly') {
     const itemSize = space / (num + 1);
     fillFull(itemSize);
-  } else if (type === 'stretch') {
-    const itemSize = space / num;
-    marginSize[0] = 0;
-    fillFull(itemSize);
   } else {
     fillFull();
   }

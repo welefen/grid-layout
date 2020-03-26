@@ -148,6 +148,7 @@ export class TrackParser extends Parser {
         value = this.parseValue(item);
       }
       value.lineNamesStart = lineNames;
+      value.lineNamesEnd = [];
       if (tracks.length) {
         tracks[tracks.length - 1].lineNamesEnd = lineNames.slice();
       }

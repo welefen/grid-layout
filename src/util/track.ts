@@ -17,7 +17,7 @@ export function isAutoRepeat(value: TrackItem): boolean {
 }
 
 export function isFixedRepeat(value: TrackItem): boolean {
-  return value.type === 'fixed-repeat';
+  return value.type === 'fix-repeat';
 }
 
 
