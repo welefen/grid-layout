@@ -1,5 +1,6 @@
 import { TrackList, GridCell, TrackItem, TrackType } from '../util/config';
 import { Container } from '../container';
+import { Node } from '../node';
 import { isAutoMinMaxTrack, isAutoTrack, isMinMaxTrack, isFrTrack } from '../util/track';
 import { parseAlignSpace } from '../util/util';
 
@@ -61,26 +62,51 @@ export class TrackCompute {
       }
     })
   }
-  private getCeilItems(index: number): GridCell[] {
+  private getCeilNodes(index: number): Node[] {
     const items = this.type === 'row' ? this.cells[index] : this.cells.map(item => item[index]);
-    return (items || []).filter(item => {
-      return item && item.node.length === 1;
+    const result: Node[] = [];
+    (items || []).forEach(item => {
+      if (item && item.node) {
+        result.push(...item.node);
+      }
     })
+    return result;
+  }
+  private getNodeCellsLength(node: Node): number {
+    const cells = node.cells;
+    if (cells.length === 1) return 1;
+    let min = 0;
+    let max = 0;
+    cells.forEach((cell, index) => {
+      const idx = this.type === 'row' ? cell.row : cell.column;
+      if (index === 0) {
+        min = idx;
+        max = idx;
+      } else {
+        min = Math.min(min, idx);
+        max = Math.max(max, idx);
+      }
+    })
+    return Math.max(1, max - min + 1);
   }
   private parseMinContent(index: number): number {
-    const items = this.getCeilItems(index);
-    const size = items.map(item => {
-      const node = item.node[0];
-      return this.type === 'row' ? node.minContentHeight : node.minContentWidth;
+    const nodes = this.getCeilNodes(index);
+    const size = nodes.map(node => {
+      const value = this.type === 'row' ? node.minContentHeight : node.minContentWidth;
+      const length = this.getNodeCellsLength(node);
+      return value / length;
     });
+    if (size.length === 0) return 0;
     return Math.max(...size);
   }
   private parseMaxContent(index: number): number {
-    const items = this.getCeilItems(index);
-    const size = items.map(item => {
-      const node = item.node[0];
-      return this.type === 'row' ? node.maxContentHeight : node.maxContentWidth;
+    const nodes = this.getCeilNodes(index);
+    const size = nodes.map(node => {
+      const value = this.type === 'row' ? node.maxContentHeight : node.maxContentWidth;
+      const length = this.getNodeCellsLength(node);
+      return value / length;
     });
+    if (size.length === 0) return 0;
     return Math.max(...size);
   }
   private parseFitContent(track: TrackItem, index: number) {

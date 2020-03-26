@@ -93,7 +93,7 @@ export interface GridCell extends BoundingRect {
   row: number; // row index in cell
   column: number; // column index in cell
   name?: string; // cell name
-  node?: Node[]; // nodes in grid
+  node: Node[]; // nodes in grid
 }
 
 export type GridLineProperty = 'gridRowStart' | 'gridRowEnd' | 'gridColumnStart' | 'gridColumnEnd';
