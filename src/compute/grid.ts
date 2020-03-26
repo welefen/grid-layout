@@ -122,9 +122,9 @@ export class GridCompute {
         for (let i = rowPlacement.start; i < rowPlacement.end; i++) {
           for (let j = columnPlacement.start; j < columnPlacement.end; j++) {
             this.putNodeInCell(i, j, node);
-            return;
           }
         }
+        return;
       }
       node.placement = { row: rowPlacement, column: columnPlacement };
       if (rowPlacement.start > -1) {
