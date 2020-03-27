@@ -75,23 +75,6 @@ export class TrackCompute {
     })
     return result;
   }
-  private getNodeCellsLength(node: Node): number {
-    const cells = node.cells;
-    if (cells.length === 1) return 1;
-    let min = 0;
-    let max = 0;
-    cells.forEach((cell, index) => {
-      const idx = this.type === 'row' ? cell.row : cell.column;
-      if (index === 0) {
-        min = idx;
-        max = idx;
-      } else {
-        min = Math.min(min, idx);
-        max = Math.max(max, idx);
-      }
-    })
-    return Math.max(1, max - min + 1);
-  }
   private getNodeInCellSize(node: Node, size: number, index: number) {
     const cells = node.cells;
     if (cells.length === 1) return size;
