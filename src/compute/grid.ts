@@ -262,10 +262,10 @@ export class GridCompute {
       }
     })
   }
-  private findPositionByCustomIndent(track: TrackList, gridLine: GridLine, type: string = 'start'): number {
+  private findPositionByCustomIdent(track: TrackList, gridLine: GridLine, type: string = 'start'): number {
     let index = -1;
     let num = 0;
-    let { customIndent, integer = 1 } = gridLine;
+    let { customIdent, integer = 1 } = gridLine;
     // end: C -1
     if (integer < 0) {
       track = track.reverse();
@@ -273,7 +273,7 @@ export class GridCompute {
     }
     track.some((item, idx) => {
       const lineNames = type === 'start' ? item.lineNamesStart : item.lineNamesEnd;
-      if (lineNames.includes(customIndent)) {
+      if (lineNames.includes(customIdent)) {
         num++;
       }
       if (num === integer) {
@@ -293,13 +293,13 @@ export class GridCompute {
       if (start.span) {
         if (!end) throw new Error('end must be set');
         if (end.span) throw new Error('end can not have span');
-        endIndex = this.findPositionByCustomIndent(track, end, 'end');
+        endIndex = this.findPositionByCustomIdent(track, end, 'end');
         if (endIndex === -1) throw new Error('can not find end index');
         // start: span C, end: C -1
-        if (start.customIndent) {
+        if (start.customIdent) {
           for (let i = endIndex - 1; i > 0; i--) {
             const item = track[i];
-            if (item.lineNamesStart.includes(start.customIndent)) {
+            if (item.lineNamesStart.includes(start.customIdent)) {
               startIndex = i;
               break;
             }
@@ -309,24 +309,24 @@ export class GridCompute {
           if (startIndex < 0) throw new Error('start index < 0');
         }
       } else {
-        if (start.customIndent) {
-          startIndex = this.findPositionByCustomIndent(track, start, 'start');
+        if (start.customIdent) {
+          startIndex = this.findPositionByCustomIdent(track, start, 'start');
         } else {
           startIndex = start.integer - 1;
         }
         if (end) {
-          if (end.span && end.customIndent) {
+          if (end.span && end.customIdent) {
             for (let i = startIndex; i < track.length; i++) {
               const item = track[i];
-              if (item.lineNamesEnd.includes(end.customIndent)) {
+              if (item.lineNamesEnd.includes(end.customIdent)) {
                 endIndex = i;
                 break;
               }
             }
           } else if (end.span && end.integer) {
             endIndex = startIndex + end.integer;
-          } else if (end.customIndent) {
-            endIndex = this.findPositionByCustomIndent(track, end, 'end');
+          } else if (end.customIdent) {
+            endIndex = this.findPositionByCustomIdent(track, end, 'end');
           } else if (end.integer) {
             endIndex = end.integer - 1;
           }
@@ -335,8 +335,8 @@ export class GridCompute {
     } else {
       if (end && Object.keys(end).length > 0) {
         if (end.span) throw new Error('end has span');
-        if (end.customIndent) {
-          endIndex = this.findPositionByCustomIndent(track, end, 'end');
+        if (end.customIdent) {
+          endIndex = this.findPositionByCustomIdent(track, end, 'end');
         } else if (end.integer) {
           endIndex = end.integer - 1;
         }

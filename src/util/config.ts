@@ -101,7 +101,7 @@ export interface GridCell extends BoundingRect {
  */
 export interface GridLine {
   span?: boolean;
-  customIndent?: string;
+  customIdent?: string;
   integer?: number;
 }
 

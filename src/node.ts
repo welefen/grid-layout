@@ -47,7 +47,7 @@ export class Node {
         } else if (/^\-?\d+$/.test(item)) {
           desc.integer = parseInt(item, 10);
         } else {
-          desc.customIndent = item;
+          desc.customIdent = item;
         }
       })
       this.config[property] = desc;
