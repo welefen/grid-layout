@@ -1,7 +1,7 @@
 import { TrackList, GridCell, TrackItem, TrackType } from '../util/config';
 import { Container } from '../container';
 import { Node } from '../node';
-import { isAutoMinMaxTrack, isAutoTrack, isMinMaxTrack, isFrTrack } from '../util/track';
+import { isAutoMinMaxTrack, isAutoTrack, isMinMaxTrack, isFrTrack, isFixedBreadth } from '../util/track';
 import { parseAlignSpace } from '../util/util';
 
 export class TrackCompute {
@@ -92,12 +92,42 @@ export class TrackCompute {
     })
     return Math.max(1, max - min + 1);
   }
+  private getNodeInCellSize(node: Node, size: number, index: number) {
+    const cells = node.cells;
+    if (cells.length === 1) return size;
+    let min = 0;
+    let max = 0;
+    cells.forEach((cell, index) => {
+      const idx = this.type === 'row' ? cell.row : cell.column;
+      if (index === 0) {
+        min = idx;
+        max = idx;
+      } else {
+        min = Math.min(min, idx);
+        max = Math.max(max, idx);
+      }
+    })
+    if (min === max) return size;
+    let num = 0;
+    for (let i = min; i <= max; i++) {
+      const track = this.trackList[i];
+      if (isFixedBreadth(track)) {
+        size -= track.baseSize;
+      } else {
+        num++;
+      }
+    }
+    const itemValue = Math.round(Math.max(0, size) / num);
+    if (index === max) {
+      return size - itemValue * (num - 1);
+    }
+    return itemValue;
+  }
   private parseMinContent(index: number): number {
     const nodes = this.getCeilNodes(index);
     const size = nodes.map(node => {
       const value = this.type === 'row' ? node.minContentHeight : node.minContentWidth;
-      const length = this.getNodeCellsLength(node);
-      return value / length;
+      return this.getNodeInCellSize(node, value, index);
     });
     if (size.length === 0) return 0;
     return Math.max(...size);
@@ -106,8 +136,7 @@ export class TrackCompute {
     const nodes = this.getCeilNodes(index);
     const size = nodes.map(node => {
       const value = this.type === 'row' ? node.maxContentHeight : node.maxContentWidth;
-      const length = this.getNodeCellsLength(node);
-      return value / length;
+      return this.getNodeInCellSize(node, value, index);
     });
     if (size.length === 0) return 0;
     return Math.max(...size);
