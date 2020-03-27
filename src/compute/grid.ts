@@ -272,12 +272,15 @@ export class GridCompute {
       integer = -integer;
     }
     track.some((item, idx) => {
-      const lineNames = type === 'string' ? item.lineNamesStart : item.lineNamesEnd;
+      const lineNames = type === 'start' ? item.lineNamesStart : item.lineNamesEnd;
       if (lineNames.includes(customIndent)) {
         num++;
       }
       if (num === integer) {
         index = idx;
+        if(type === 'end') {
+          index += 1;
+        }
         return true;
       }
     });
