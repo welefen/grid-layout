@@ -48,9 +48,11 @@ export class TrackCompute {
         const minValue = this.parseTrackItemValue(min, index);
         const minContentValue = this.parseMinContent(index);
         const maxValue = this.parseTrackItemValue(max, index);
-        track.baseSize = Math.max(minValue, minContentValue);
         if (maxValue > -1) {
           track.growthLimit = maxValue;
+          track.baseSize = Math.max(minValue, Math.min(minContentValue, maxValue));
+        } else {
+          track.baseSize = Math.max(minValue, minContentValue);
         }
         if (track.growthLimit < track.baseSize) {
           track.growthLimit = track.baseSize;
