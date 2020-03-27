@@ -23,10 +23,10 @@ export class Node {
       if (item.startsWith('border') || item.startsWith('padding') || item.startsWith('margin')) {
         this.parseCombineProperty(<BorderPaddingMarginProperty>item);
       }
-      if (/^grid(?:Row|Column)(?:Start|End)$/.test(item)) {
-        this.parseGridLine(<GridLineProperty>item);
-      }
-    })
+    });
+    ['gridRowStart', 'gridRowEnd', 'gridColumnStart', 'gridColumnEnd'].forEach(item => {
+      this.parseGridLine(<GridLineProperty>item);
+    });
     this.parseSize();
   }
   private parseGridLine(property: GridLineProperty): void {

@@ -22,8 +22,8 @@
       "justifySelf": "auto",
       "gridRowStart": "",
       "gridRowEnd": "",
-      "gridColumnStart": "n3",
-      "gridColumnEnd": "n4",
+      "gridColumnStart": "n1",
+      "gridColumnEnd": "n2",
       "gridArea": "",
       "width": 100,
       "minWidth": "",
@@ -121,19 +121,19 @@
         "width": 100,
         "height": 100,
         "top": 0,
-        "left": 334
-      },
-      {
-        "width": 100,
-        "height": 100,
-        "top": 250,
         "left": 0
       },
       {
         "width": 100,
         "height": 100,
-        "top": 250,
+        "top": 0,
         "left": 167
+      },
+      {
+        "width": 100,
+        "height": 100,
+        "top": 0,
+        "left": 334
       }
     ]
   }
