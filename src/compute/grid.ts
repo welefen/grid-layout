@@ -1,5 +1,5 @@
 import deepmerge from 'ts-deepmerge';
-import { GridCell, TrackList, GridLine, GridAutoFlow, TrackType } from '../util/config';
+import { GridCell, TrackList, GridLine, GridAutoFlow, TrackType, TrackItem } from '../util/config';
 import { Node } from '../node';
 import { Container } from '../container';
 
@@ -18,7 +18,9 @@ export class GridCompute {
   areaNames: AreaNames = {};
   container: Container;
   rowTrack: TrackList;
+  initRowTrackSize: number;
   columnTrack: TrackList;
+  initColumnTrackSize: number;
   autoRowTrack: TrackList;
   autoRowIndex: number = 0; // index of grid-auto-row
   autoColumnTrack: TrackList;
@@ -27,22 +29,33 @@ export class GridCompute {
   constructor(container: Container) {
     this.container = container;
     this.rowTrack = <TrackList>container.config.gridTemplateRows || [];
+    this.initRowTrackSize = this.rowTrack.length;
     this.columnTrack = <TrackList>container.config.gridTemplateColumns || [];
+    this.initColumnTrackSize = this.columnTrack.length;
     this.autoRowTrack = <TrackList>container.config.gridAutoRows || [];
     if (!this.autoRowTrack.length) {
-      this.autoRowTrack[0] = { type: 'auto', baseSize: 0, growthLimit: Infinity };
+      this.autoRowTrack[0] = this.defaultAutoTrack;
     }
     if (!this.rowTrack.length) {
-      this.rowTrack[0] = this.autoRowTrack[0];
+      this.rowTrack[0] = deepmerge({}, this.autoRowTrack[0]);
     }
     this.autoColumnTrack = <TrackList>container.config.gridAutoColumns || [];
     if (!this.autoColumnTrack.length) {
-      this.autoColumnTrack[0] = { type: 'auto', baseSize: 0, growthLimit: Infinity };
+      this.autoColumnTrack[0] = this.defaultAutoTrack;
     }
     if (!this.columnTrack.length) {
-      this.columnTrack[0] = this.autoColumnTrack[0];
+      this.columnTrack[0] = deepmerge({}, this.autoColumnTrack[0]);
     }
     this.autoFlow = <GridAutoFlow>this.container.config.gridAutoFlow || {};
+  }
+  get defaultAutoTrack(): TrackItem {
+    return {
+      type: 'auto',
+      baseSize: 0,
+      growthLimit: Infinity,
+      lineNamesStart: [],
+      lineNamesEnd: []
+    };
   }
   get rowSize(): number {
     return this.rowTrack.length;
@@ -116,8 +129,8 @@ export class GridCompute {
         return;
       }
       const { gridRowStart, gridRowEnd, gridColumnStart, gridColumnEnd } = node.config;
-      const rowPlacement = this.parseGridPlacement(this.rowTrack, <GridLine>gridRowStart, <GridLine>gridRowEnd);
-      const columnPlacement = this.parseGridPlacement(this.columnTrack, <GridLine>gridColumnStart, <GridLine>gridColumnEnd);
+      const rowPlacement = this.parseGridPlacement(this.rowTrack, <GridLine>gridRowStart, <GridLine>gridRowEnd, this.initRowTrackSize);
+      const columnPlacement = this.parseGridPlacement(this.columnTrack, <GridLine>gridColumnStart, <GridLine>gridColumnEnd, this.initColumnTrackSize);
       if (rowPlacement.start > -1 && columnPlacement.start > -1) {
         for (let i = rowPlacement.start; i < rowPlacement.end; i++) {
           for (let j = columnPlacement.start; j < columnPlacement.end; j++) {
@@ -278,7 +291,7 @@ export class GridCompute {
       }
       if (num === integer) {
         index = idx;
-        if(type === 'end') {
+        if (type === 'end') {
           index += 1;
         }
         return true;
@@ -286,77 +299,124 @@ export class GridCompute {
     });
     return index;
   }
-  private parseGridPlacement(track: TrackList, start?: GridLine, end?: GridLine) {
-    let startIndex = -1;
-    let endIndex = -1;
-    if (start && Object.keys(start).length > 0) {
-      if (start.span) {
-        if (!end) throw new Error('end must be set');
-        if (end.span) throw new Error('end can not have span');
-        endIndex = this.findPositionByCustomIdent(track, end, 'end');
-        if (endIndex === -1) throw new Error('can not find end index');
-        // start: span C, end: C -1
-        if (start.customIdent) {
-          for (let i = endIndex - 1; i > 0; i--) {
-            const item = track[i];
-            if (item.lineNamesStart.includes(start.customIdent)) {
-              startIndex = i;
+  private parseGridPlacement(track: TrackList, start: GridLine, end: GridLine, initSize: number) {
+    const pos = { start: -1, end: -1 };
+    if (start.span) {
+      if (end.span) {
+        // start: span n1, end: span xxx
+        if (start.customIdent) return pos;
+        // start: span 2, end: span xxx
+        if (start.integer) {
+          pos.start = 0;
+          pos.end = start.integer;
+          return pos;
+        }
+      } else if (end.customIdent) {
+        pos.end = this.findPositionByCustomIdent(track, end, 'end');
+        if (pos.end === -1) {
+          pos.end = track.length;
+        }
+      } else if (end.integer) {
+        pos.end = end.integer - 1;
+      }
+      // start: span C
+      if (start.customIdent) {
+        // start: span n1, end: 5
+        if (pos.end > -1) {
+          for (let i = pos.end - 1; i > 0; i--) {
+            if (track[i].lineNamesStart.includes(start.customIdent)) {
+              pos.start = i;
               break;
             }
           }
-        } else if (start.integer) {
-          startIndex = endIndex - start.integer;
-          if (startIndex < 0) throw new Error('start index < 0');
         }
-      } else {
-        if (start.customIdent) {
-          startIndex = this.findPositionByCustomIdent(track, start, 'start');
+      } else if (start.integer) {
+        // start: span 2, end: 4
+        // start: span 3, end: 1
+        if (pos.end > -1) {
+          pos.start = Math.max(0, pos.end - start.integer);
+          pos.end = pos.start + start.integer;
         } else {
-          startIndex = start.integer - 1;
+          pos.start = 0;
+          pos.end = start.integer;
         }
-        if (end) {
-          if (end.span && end.customIdent) {
-            for (let i = startIndex; i < track.length; i++) {
-              const item = track[i];
-              if (item.lineNamesEnd.includes(end.customIdent)) {
-                endIndex = i;
-                break;
-              }
-            }
-          } else if (end.span && end.integer) {
-            endIndex = startIndex + end.integer;
-          } else if (end.customIdent) {
-            endIndex = this.findPositionByCustomIdent(track, end, 'end');
-          } else if (end.integer) {
-            endIndex = end.integer - 1;
+      }
+      return pos;
+    }
+    // start: n1
+    if (start.customIdent) {
+      pos.start = this.findPositionByCustomIdent(track, start, 'start');
+      if (pos.start === -1) {
+        const size = initSize + 1;
+        if (!end.span && end.customIdent) {
+          const index = this.findPositionByCustomIdent(track, end, 'start');
+          if (index > -1) {
+            pos.start = index;
+            pos.end = size;
+          } else {
+            pos.start = size;
+            pos.end = pos.start + 1;
+          }
+          return pos;
+        } else if (!end.span && end.integer) {
+          const integer = end.integer - 1;
+          if (integer > size) {
+            pos.start = size;
+            pos.end = integer;
+          } else {
+            pos.start = integer;
+            pos.end = size === integer ? size + 1 : size;
+          }
+          return pos;
+        }
+      }
+    } else if (start.integer) {
+      pos.start = start.integer - 1;
+    }
+    if (end.span) {
+      if (pos.start === -1) {
+        pos.start = 0;
+      }
+      if (end.customIdent) {
+        for (let i = pos.start; i < track.length; i++) {
+          if (track[i].lineNamesEnd.includes(end.customIdent)) {
+            pos.end = i;
+            break;
           }
         }
+      } else if (end.integer) {
+        pos.end = pos.start + end.integer;
       }
-    } else {
-      if (end && Object.keys(end).length > 0) {
-        if (end.span) throw new Error('end has span');
-        if (end.customIdent) {
-          endIndex = this.findPositionByCustomIdent(track, end, 'end');
-        } else if (end.integer) {
-          endIndex = end.integer - 1;
+    } else if (end.customIdent) {
+      pos.end = this.findPositionByCustomIdent(track, end, 'end');
+      if (pos.end === -1) {
+        if (!start.span && start.customIdent) {
+          const index = this.findPositionByCustomIdent(track, end, 'start');
+          if (index === -1) {
+            pos.end = initSize + 1;
+          } else if (index < pos.start) {
+            pos.end = pos.start;
+            pos.start = index;
+          }
+        } else if (!start.span && !start.customIdent && !start.integer) {
+          pos.end = initSize + 1;
         }
       }
+    } else if (end.integer) {
+      pos.end = end.integer - 1;
     }
-    if (startIndex > -1) {
-      if (endIndex === -1) {
-        endIndex = startIndex + 1;
-      }
-    } else if (endIndex > -1) {
-      if (startIndex === -1) {
-        startIndex = endIndex - 1;
-      }
+    if (pos.start > -1 && pos.end === -1) {
+      pos.end = pos.start + 1;
+    } else if (pos.end > -1 && pos.start === -1) {
+      pos.start = pos.end - 1;
+    } else if (pos.start !== -1 && pos.start === pos.end) {
+      pos.end++;
     }
-    if (startIndex !== -1 && startIndex === endIndex) {
-      endIndex++;
+    if (pos.start > pos.end) {
+      const tmp = pos.end;
+      pos.end = pos.start;
+      pos.start = tmp;
     }
-    if (startIndex > endIndex) {
-      throw new Error('start index max than end index');
-    }
-    return { start: startIndex, end: endIndex };
+    return pos;
   }
 }
