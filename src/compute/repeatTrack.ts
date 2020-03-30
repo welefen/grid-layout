@@ -1,7 +1,7 @@
-import deepmerge from 'ts-deepmerge';
+import { deepmerge } from '../util/util';
 import { Container } from '../container';
 import { TrackList, TrackItem, TrackType } from '../util/config';
-import { isFixedBreadth, isAutoRepeat, isFixedRepeat } from '../util/track';
+import { isFixedBreadth, isAutoRepeat, isFixedRepeat, isAutoFitRepeat } from '../util/track';
 
 export class RepeatTrackCompute {
   trackList: TrackList;
@@ -23,7 +23,7 @@ export class RepeatTrackCompute {
     let i = 0;
     while (i++ < repeatNum) {
       repeatValue.forEach(item => {
-        result.push(deepmerge({}, item));
+        result.push(deepmerge(item));
       })
     }
     return result;
@@ -52,12 +52,14 @@ export class RepeatTrackCompute {
     let size = 0;
     let repeatTrack: TrackItem;
     let repeatIndex: number;
+    let isAutoFit = false;
 
     this.trackList.forEach((item, index) => {
       size += this.getTrackItemValue(item);
       if (isAutoRepeat(item)) {
         repeatTrack = item;
         repeatIndex = index;
+        isAutoFit = isAutoFitRepeat(item);
       }
     })
     let leaveSpace = this.size - size;
@@ -83,6 +85,12 @@ export class RepeatTrackCompute {
       }
     }
     const repeatResult = this.expandFixedRepeat(repeatTrack, count);
+    // auto-fit repeat
+    if (isAutoFit) {
+      repeatResult.forEach(item => {
+        item.autoFit = true;
+      })
+    }
     this.trackList.splice(repeatIndex, 1, ...repeatResult);
   }
   /**

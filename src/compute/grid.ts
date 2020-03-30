@@ -1,4 +1,4 @@
-import deepmerge from 'ts-deepmerge';
+import { deepmerge } from '../util/util';
 import { GridCell, TrackList, GridLine, GridAutoFlow, TrackType, TrackItem } from '../util/config';
 import { Node } from '../node';
 import { Container } from '../container';
@@ -37,14 +37,14 @@ export class GridCompute {
       this.autoRowTrack[0] = this.defaultAutoTrack;
     }
     if (!this.rowTrack.length) {
-      this.rowTrack[0] = deepmerge({}, this.autoRowTrack[0]);
+      this.rowTrack[0] = deepmerge(this.autoRowTrack[0]);
     }
     this.autoColumnTrack = <TrackList>container.config.gridAutoColumns || [];
     if (!this.autoColumnTrack.length) {
       this.autoColumnTrack[0] = this.defaultAutoTrack;
     }
     if (!this.columnTrack.length) {
-      this.columnTrack[0] = deepmerge({}, this.autoColumnTrack[0]);
+      this.columnTrack[0] = deepmerge(this.autoColumnTrack[0]);
     }
     this.autoFlow = <GridAutoFlow>this.container.config.gridAutoFlow || {};
   }
@@ -96,9 +96,9 @@ export class GridCompute {
       const length = autoTrack.length;
       for (let i = track.length; i < size; i++) {
         if (isRow) {
-          track[i] = deepmerge({}, autoTrack[this.autoRowIndex++ % length]);
+          track[i] = deepmerge(autoTrack[this.autoRowIndex++ % length]);
         } else {
-          track[i] = deepmerge({}, autoTrack[this.autoColumnIndex++ % length]);
+          track[i] = deepmerge(autoTrack[this.autoColumnIndex++ % length]);
         }
       }
     }

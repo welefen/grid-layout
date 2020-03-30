@@ -21,7 +21,6 @@ export class TrackCompute {
     const gap = <number>(this.type === 'row' ? config.gridRowGap : config.gridColumnGap);
     this.gap = gap;
     this.containerSize = this.type === 'row' ? config.height : config.width;
-    this.freeSpace = this.containerSize - gap * (trackList.length - 1);
   }
   private parseTrackItemValue(track: TrackItem, index: number): number {
     switch (track.type) {
@@ -39,6 +38,17 @@ export class TrackCompute {
         return track.value;
     }
     return -1;
+  }
+  private removeEmptyAutoFitTrack() {
+    const tracks: TrackList = [];
+    this.trackList.forEach((track, index) => {
+      if (track.autoFit) {
+        const nodes = this.getTrackNodes(index);
+        if (nodes.length === 0) return;
+      }
+      tracks.push(track);
+    })
+    this.trackList = tracks;
   }
   private parseTrackSize() {
     this.trackList.forEach((track, index) => {
@@ -65,7 +75,7 @@ export class TrackCompute {
       }
     })
   }
-  private getCeilNodes(index: number): Node[] {
+  private getTrackNodes(index: number): Node[] {
     const items = this.type === 'row' ? this.cells[index] : this.cells.map(item => item[index]);
     const result: Node[] = [];
     (items || []).forEach(item => {
@@ -107,7 +117,7 @@ export class TrackCompute {
     return itemValue;
   }
   private parseMinContent(index: number): number {
-    const nodes = this.getCeilNodes(index);
+    const nodes = this.getTrackNodes(index);
     const size = nodes.map(node => {
       const value = this.type === 'row' ? node.minContentHeight : node.minContentWidth;
       return this.getNodeInCellSize(node, value, index);
@@ -116,7 +126,7 @@ export class TrackCompute {
     return Math.max(...size);
   }
   private parseMaxContent(index: number): number {
-    const nodes = this.getCeilNodes(index);
+    const nodes = this.getTrackNodes(index);
     const size = nodes.map(node => {
       const value = this.type === 'row' ? node.maxContentHeight : node.maxContentWidth;
       return this.getNodeInCellSize(node, value, index);
@@ -228,7 +238,6 @@ export class TrackCompute {
             minmaxCount--;
             flag = true;
           }
-
         }
       })
       if (!flag) {
@@ -285,6 +294,8 @@ export class TrackCompute {
     })
   }
   public parse() {
+    this.removeEmptyAutoFitTrack();
+    this.freeSpace = this.containerSize - this.gap * (this.trackList.length - 1);
     this.parseTrackSize();
     this.parseFrTrack();
     this.parseMinMaxTrack();

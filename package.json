@@ -35,6 +35,6 @@
     "typescript": "^3.6.4"
   },
   "dependencies": {
-    "ts-deepmerge": "^1.0.2"
+    
   }
 }

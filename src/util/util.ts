@@ -1,4 +1,6 @@
-
+export const deepmerge = function (obj: any) {
+  return JSON.parse(JSON.stringify(obj));
+}
 /**
  * parse space between items
  * @param {Number} space space size

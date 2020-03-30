@@ -16,6 +16,10 @@ export function isAutoRepeat(value: TrackItem): boolean {
   return value.type === 'auto-fill-repeat' || value.type === 'auto-fit-repeat';
 }
 
+export function isAutoFitRepeat(value: TrackItem): boolean {
+  return value.type === 'auto-fit-repeat';
+}
+
 export function isFixedRepeat(value: TrackItem): boolean {
   return value.type === 'fix-repeat';
 }

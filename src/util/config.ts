@@ -75,7 +75,7 @@ export interface TrackItem {
   growthLimit?: number;
   lineNamesStart?: string[];
   lineNamesEnd?: string[];
-  repeat?: string; // expand from auto-fill repeat or auto-fit repeat
+  autoFit?: boolean; // expand from auto-fit
   pos?: number; // track position
 }
 
