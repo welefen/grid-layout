@@ -1,5 +1,5 @@
 import { deepmerge } from '../util/util';
-import { GridCell, TrackList, GridLine, GridAutoFlow, TrackType, TrackItem } from '../util/config';
+import { GridCell, TrackList, GridLine, GridAutoFlow, TrackType, TrackItem, GridPlacement } from '../util/config';
 import { Node } from '../node';
 import { Container } from '../container';
 
@@ -28,18 +28,18 @@ export class GridCompute {
   autoFlow: GridAutoFlow;
   constructor(container: Container) {
     this.container = container;
-    this.rowTrack = <TrackList>container.config.gridTemplateRows || [];
+    this.rowTrack = <TrackList>container.config.gridTemplateRows;
     this.initRowTrackSize = this.rowTrack.length;
-    this.columnTrack = <TrackList>container.config.gridTemplateColumns || [];
+    this.columnTrack = <TrackList>container.config.gridTemplateColumns;
     this.initColumnTrackSize = this.columnTrack.length;
-    this.autoRowTrack = <TrackList>container.config.gridAutoRows || [];
+    this.autoRowTrack = <TrackList>container.config.gridAutoRows;
     if (!this.autoRowTrack.length) {
       this.autoRowTrack[0] = this.defaultAutoTrack;
     }
     if (!this.rowTrack.length) {
       this.rowTrack[0] = deepmerge(this.autoRowTrack[0]);
     }
-    this.autoColumnTrack = <TrackList>container.config.gridAutoColumns || [];
+    this.autoColumnTrack = <TrackList>container.config.gridAutoColumns;
     if (!this.autoColumnTrack.length) {
       this.autoColumnTrack[0] = this.defaultAutoTrack;
     }
@@ -147,6 +147,7 @@ export class GridCompute {
       const { gridRowStart, gridRowEnd, gridColumnStart, gridColumnEnd } = node.config;
       const rowPlacement = this.parseGridPlacement(this.rowTrack, <GridLine>gridRowStart, <GridLine>gridRowEnd, this.initRowTrackSize);
       const columnPlacement = this.parseGridPlacement(this.columnTrack, <GridLine>gridColumnStart, <GridLine>gridColumnEnd, this.initColumnTrackSize);
+      node.placement = { row: rowPlacement, column: columnPlacement };
       if (rowPlacement.start > -1 && columnPlacement.start > -1) {
         for (let i = rowPlacement.start; i < rowPlacement.end; i++) {
           for (let j = columnPlacement.start; j < columnPlacement.end; j++) {
@@ -155,7 +156,6 @@ export class GridCompute {
         }
         return;
       }
-      node.placement = { row: rowPlacement, column: columnPlacement };
       if (rowPlacement.start > -1) {
         this.flexTrackSize('row', rowPlacement.end);
         // auto-flow is row
@@ -222,8 +222,8 @@ export class GridCompute {
     const { row, column } = node.placement;
     if (row.start > -1 && row.start !== rowIndex) return false;
     if (column.start > -1 && column.start !== columnIndex) return false;
-    const rowEnd = row.end === -1 ? rowIndex + 1 : row.end;
-    const columnEnd = column.end === -1 ? columnIndex + 1 : column.end;
+    const rowEnd = row.end === -1 ? rowIndex + row.size : row.end;
+    const columnEnd = column.end === -1 ? columnIndex + column.size : column.end;
     for (let i = rowIndex; i < rowEnd; i++) {
       for (let j = columnIndex; j < columnEnd; j++) {
         if (this.cells[i] && this.cells[i][j] && this.cells[i][j].node.length) {
@@ -291,7 +291,7 @@ export class GridCompute {
       }
     })
   }
-  private findPositionByCustomIdent(track: TrackList, gridLine: GridLine, type: string = 'start'): number {
+  private findPositionByCustomIdent(track: TrackList, gridLine: GridLine, type: string): number {
     let index = -1;
     let num = 0;
     let { customIdent, integer = 1 } = gridLine;
@@ -316,21 +316,20 @@ export class GridCompute {
     return index;
   }
   private parseGridPlacement(track: TrackList, start: GridLine, end: GridLine, initSize: number) {
-    const pos = { start: -1, end: -1 };
+    const pos = { start: -1, end: -1, size: 1 };
     if (start.span) {
       if (end.span) {
         // start: span n1, end: span xxx
         if (start.customIdent) return pos;
         // start: span 2, end: span xxx
         if (start.integer) {
-          pos.start = 0;
-          pos.end = start.integer;
+          pos.size = start.integer;
           return pos;
         }
       } else if (end.customIdent) {
         pos.end = this.findPositionByCustomIdent(track, end, 'end');
         if (pos.end === -1) {
-          pos.end = track.length;
+          pos.end = initSize + 1;
         }
       } else if (end.integer) {
         pos.end = end.integer - 1;

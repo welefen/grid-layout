@@ -5,7 +5,6 @@ import { Container, Node } from "../lib/index";
 import fs from 'fs';
 
 const files = getdirFiles(path.join(__dirname, 'case'));
-console.log('files', files);
 
 files.forEach(file => {
   test(file, t => {

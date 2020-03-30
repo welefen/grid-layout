@@ -10,8 +10,8 @@ export class Node {
   boundingRect: BoundingRect = {};
   cells: GridCell[] = []; // node in cells
   placement: GridPlacement = { // node placement with grid-row-start/grid-column-start
-    row: { start: -1, end: -1 },
-    column: { start: -1, end: -1 }
+    row: { start: -1, end: -1, size: 1 },
+    column: { start: -1, end: -1, size: 1 }
   };
   constructor(config: NodeConfig = {}) {
     this.id = id++;
@@ -214,7 +214,7 @@ export class Node {
           if (value > this.boundingRect[sizeProp]) {
             this.boundingRect[sizeProp] = value;
           }
-        } 
+        }
         this.boundingRect[prop] = boundingRect[prop] + marginStart;
         break;
     }

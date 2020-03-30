@@ -7,7 +7,7 @@ export type GridLineProperty = 'gridRowStart' | 'gridRowEnd' | 'gridColumnStart'
 export type TrackSizeProperty = 'gridTemplateRows' | 'gridTemplateColumns' | 'gridAutoRows' | 'gridAutoColumns';
 export type StringOrNumber = string | number;
 export type BorderProperty = 'border' | 'borderTop' | 'borderRight' | 'borderBottom' | 'borderLeft';
-export type PaddingProperty= 'padding' | 'paddingTop' | 'paddingRight' | 'paddingBottom' | 'paddingLeft';
+export type PaddingProperty = 'padding' | 'paddingTop' | 'paddingRight' | 'paddingBottom' | 'paddingLeft';
 export type MarginProperty = 'margin' | 'marginTop' | 'marginRight' | 'marginBottom' | 'marginLeft';
 export type BorderPaddingMarginProperty = BorderProperty | PaddingProperty | MarginProperty;
 export type TrackType = 'row' | 'column';
@@ -118,6 +118,6 @@ export interface GridAutoFlow {
  * parsed grid position
  */
 export interface GridPlacement {
-  row: { start: number, end: number };
-  column: { start: number, end: number }
+  row: { start: number, end: number, size: number };
+  column: { start: number, end: number, size: number }
 }
