@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "tsc --watch",
-    "test": "tsc test/**/*.ts && ava test/**/*.js --verbose"
+    "test": "nyc ava test/test.js && nyc report --reporter=html"
   },
   "ava": {
     "compileEnhancements": false,
@@ -31,10 +31,10 @@
   "homepage": "https://github.com/welefen/grid-layout#readme",
   "devDependencies": {
     "ava": "^2.4.0",
+    "nyc": "^15.0.0",
+    "think-helper": "^1.1.2",
     "ts-node": "^8.4.1",
     "typescript": "^3.6.4"
   },
-  "dependencies": {
-    
-  }
+  "dependencies": {}
 }
