@@ -22,27 +22,25 @@ export class AreaParser extends Parser {
   }
   checkAreaName(tokens: string[][], rowIndex: number, columnIndex: number) {
     const name = tokens[rowIndex][columnIndex];
-    let type: string = '';
+    let maxRow = rowIndex;
+    let maxColumn = columnIndex;
     for (let i = rowIndex, length = tokens.length; i < length; i++) {
       const start = i === rowIndex ? columnIndex + 1 : 0;
       for (let j = start; j < tokens[i].length; j++) {
         const item = tokens[i][j];
-        if (name === item) {
-          let err: boolean = false;
-          if (rowIndex !== i && columnIndex !== j) {
-            err = true;
-          } else if (type === 'row' && columnIndex === j) {
-            err = true;
-          } else if (type === 'column' && rowIndex === i) {
-            err = true;
-          } else if (!type && columnIndex === j) {
-            type = 'column';
-          } else if (!type && rowIndex === i) {
-            type = 'row';
+        if (item === name) {
+          if (j < columnIndex) {
+            throw new Error('areas is not valid');
           }
-          if (err) {
-            throw new Error(`area name ${name} not valid`);
-          }
+          maxRow = Math.max(maxRow, i);
+          maxColumn = Math.max(maxColumn, j);
+        }
+      }
+    }
+    for (let i = rowIndex; i <= maxRow; i++) {
+      for (let j = columnIndex; j <= maxColumn; j++) {
+        if (tokens[i][j] !== name) {
+          throw new Error('areas is not valid');
         }
       }
     }
