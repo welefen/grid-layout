@@ -1,7 +1,7 @@
 import { TrackList, GridCell, TrackItem, TrackType } from '../util/config';
 import { Container } from '../container';
 import { Node } from '../node';
-import { isAutoMinMaxTrack, isAutoTrack, isMinMaxTrack, isFrTrack, isFixedBreadth } from '../util/track';
+import { isAutoMinMaxTrack, isAutoTrack, isMinMaxTrack, isFrTrack, isFixedBreadth, isFrMinMaxTrack } from '../util/track';
 import { parseAlignSpace } from '../util/util';
 
 export class TrackCompute {
@@ -163,10 +163,22 @@ export class TrackCompute {
           const space = track.value * itemSpace;
           const minSpace = this.parseMinContent(index);
           if (space < minSpace) {
+            frCount -= track.value;
             freeSpace -= minSpace;
             track.baseSize = minSpace;
             track.growthLimit = track.baseSize;
             track.type = 'px';
+            flag = true;
+          }
+        } else if (isFrMinMaxTrack(track)) {
+          const max = <TrackItem>track.args[1];
+          const space = max.value * itemSpace;
+          if (space < track.baseSize) {
+            frCount -= max.value;
+            freeSpace -= track.baseSize;
+            track.growthLimit = track.baseSize;
+            max.value = track.baseSize;
+            max.type = 'px';
             flag = true;
           }
         }
@@ -176,16 +188,14 @@ export class TrackCompute {
           if (isFrTrack(track)) {
             track.baseSize = track.value * itemSpace;
             track.type = 'px';
-          } else if (isMinMaxTrack(track)) {
+          } else if (isFrMinMaxTrack(track)) {
             const max = <TrackItem>track.args[1];
-            if (isFrTrack(max)) {
-              const space = max.value * itemSpace;
-              max.value = space;
-              max.type = 'px';
-              track.growthLimit = space;
-              if (track.growthLimit < track.baseSize) {
-                track.growthLimit = track.baseSize;
-              }
+            const space = max.value * itemSpace;
+            max.value = space;
+            max.type = 'px';
+            track.growthLimit = space;
+            if (track.growthLimit < track.baseSize) {
+              track.growthLimit = track.baseSize;
             }
           }
         })
