@@ -105,15 +105,6 @@ export class GridCompute {
   }
 
   public setAreas(areas: string[][]) {
-    areas.forEach((line, row) => {
-      line.forEach((name, column) => {
-        if (!name) return;
-        if (!this.areaNames[name]) {
-          this.areaNames[name] = [];
-        }
-        this.areaNames[name].push({ row, column });
-      })
-    })
     this.flexTrackSize('row', areas.length);
     this.flexTrackSize('column', areas[0].length);
     if (areas.length > this.initRowTrackSize) {
@@ -122,6 +113,19 @@ export class GridCompute {
     if (areas[0].length > this.initColumnTrackSize) {
       this.initColumnTrackSize = areas[0].length;
     }
+    areas.forEach((line, row) => {
+      line.forEach((name, column) => {
+        if (!name) return;
+        if (!this.areaNames[name]) {
+          this.areaNames[name] = [];
+        }
+        this.areaNames[name].push({ row, column });
+        this.rowTrack[row].lineNamesStart.push(`${name}-start`);
+        this.rowTrack[row].lineNamesEnd.push(`${name}-end`);
+        this.columnTrack[column].lineNamesStart.push(`${name}-start`);
+        this.columnTrack[column].lineNamesEnd.push(`${name}-end`);
+      })
+    })
   }
 
   public putNodes(nodes: Node[]) {
