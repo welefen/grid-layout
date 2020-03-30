@@ -118,7 +118,7 @@
           <el-input v-model="gridItem.gridColumnEnd" type="text" @change="changeProperty('gridColumnEnd', $event)"></el-input>
         </el-form-item>
         <el-form-item label="grid-area">
-          <el-input v-model="gridItem.girdArea" type="text" @change="changeProperty('girdArea', $event)"></el-input>
+          <el-input v-model="gridItem.gridArea" type="text" @change="changeProperty('gridArea', $event)"></el-input>
         </el-form-item>
 
         <el-form-item label="width">

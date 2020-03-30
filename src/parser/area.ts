@@ -9,8 +9,8 @@ export class AreaParser extends Parser {
     const maxColumnsArr = [...new Array(maxColumns)];
     const names: string[] = [];
     tokens.forEach((row, rowIndex) => {
-      maxColumnsArr.forEach((column, columnIndex) => {
-        column = column.replace(/\.+/, ''); //replace multi `.` to empty
+      maxColumnsArr.forEach((_, columnIndex) => {
+        const column = (row[columnIndex] || '').replace(/\.+/, ''); //replace multi `.` to empty
         if (column !== '' && !names.includes(column)) {
           this.checkAreaName(tokens, rowIndex, columnIndex);
           names.push(column);

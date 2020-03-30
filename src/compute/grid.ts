@@ -91,8 +91,8 @@ export class GridCompute {
   private flexTrackSize(type: TrackType, size: number): void {
     const isRow = type === 'row';
     const track = isRow ? this.rowTrack : this.columnTrack;
-    const autoTrack = isRow ? this.autoRowTrack : this.autoColumnTrack;
     if (track.length < size) {
+      const autoTrack = isRow ? this.autoRowTrack : this.autoColumnTrack;
       const length = autoTrack.length;
       for (let i = track.length; i < size; i++) {
         if (isRow) {
@@ -114,6 +114,14 @@ export class GridCompute {
         this.areaNames[name].push({ row, column });
       })
     })
+    this.flexTrackSize('row', areas.length);
+    this.flexTrackSize('column', areas[0].length);
+    if (areas.length > this.initRowTrackSize) {
+      this.initRowTrackSize = areas.length;
+    }
+    if (areas[0].length > this.initColumnTrackSize) {
+      this.initColumnTrackSize = areas[0].length;
+    }
   }
 
   public putNodes(nodes: Node[]) {
@@ -122,10 +130,14 @@ export class GridCompute {
     nodes.forEach(node => {
       const area = node.config.gridArea;
       // put node in container by grid-area
-      if (area && this.areaNames[area]) {
-        this.areaNames[area].forEach(pos => {
-          this.putNodeInCell(pos.row, pos.column, node);
-        })
+      if (area) {
+        if (this.areaNames[area]) {
+          this.areaNames[area].forEach(pos => {
+            this.putNodeInCell(pos.row, pos.column, node);
+          })
+        } else {
+          this.putNodeInCell(this.initRowTrackSize + 1, this.initColumnTrackSize + 1, node);
+        }
         return;
       }
       const { gridRowStart, gridRowEnd, gridColumnStart, gridColumnEnd } = node.config;
