@@ -12,39 +12,6 @@
   "errmsgField": "errmsg",
   "defaultErrno": 1000,
   "validateDefaultErrno": 1001,
-  "cache": {
-    "type": "file",
-    "file": {
-      "timeout": 86400000,
-      "cachePath": "/Users/welefen/Develop/git/grid-layout/web/runtime/cache",
-      "pathDepth": 1,
-      "gcInterval": 86400000
-    }
-  },
-  "model": {
-    "type": "mysql",
-    "mysql": {
-      "logConnect": true,
-      "logSql": true,
-      "database": "",
-      "prefix": "think_",
-      "encoding": "utf8",
-      "host": "127.0.0.1",
-      "port": "",
-      "user": "root",
-      "password": "root",
-      "dateStrings": true
-    }
-  },
-  "session": {
-    "type": "file",
-    "file": {
-      "cookie": {
-        "name": "thinkjs"
-      },
-      "sessionPath": "/Users/welefen/Develop/git/grid-layout/web/runtime/session"
-    }
-  },
   "view": {
     "type": "nunjucks",
     "nunjucks": {
