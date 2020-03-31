@@ -1,6 +1,6 @@
 {
   "name": "@welefen/grid-layout",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "CSS Grid Layout, can use in Canvas/node-canvas",
   "main": "lib/index.js",
   "types": "src/index.d.ts",
