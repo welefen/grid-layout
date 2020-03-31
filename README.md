@@ -30,7 +30,7 @@ npm i @welefen/grid-layout
 
 ```js
 import { Container, Node } from '@welefen/grid-layout';
-const container = new Container({
+const container = new Container({ // containerOptions
   width: 500,
   height: 500
 });
@@ -38,7 +38,7 @@ const container = new Container({
   { width: 100, height: 100 },
   { width: 100, height: 100 }
 ].forEach(item => {
-  const node = new Node(item);
+  const node = new Node(item); // nodeOptions
   container.appendChild(node);
 });
 container.calculateLayout();
