@@ -128,11 +128,11 @@ export interface ContainerBoundingRect extends BoundingRect {
   children?: BoundingRect[]
 }
 
-interface position {
+interface Position {
   row: number;
   column: number;
 }
 
 export interface AreaNames {
-  [key: string]: position[];
+  [key: string]: Position[];
 }
