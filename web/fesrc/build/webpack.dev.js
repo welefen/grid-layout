@@ -34,15 +34,11 @@ module.exports = merge(common,
     devtool: 'source-map',
     devServer: {
       proxy: {
-        '*': 'http://localhost:8360'
+        '*': 'http://localhost:8080'
       },
       port: '8361',
       publicPath: '/static/',
-      contentBase: '../../www/static/',
-      // run dev 打开浏览器
-      // open: true,
-      // 关闭无用log，只有在报错和warning时报错
-      // noInfo: true,
+      contentBase: '../../www/static/'
     },
   }
 );
