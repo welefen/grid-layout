@@ -40,6 +40,7 @@ const result = container.getAllComputedLayout();
 
 ### containerOptions
 
+
 ```js
 {
   gridAutoFlow?: string;
@@ -58,7 +59,12 @@ const result = container.getAllComputedLayout();
   justifyContent?: ContentAlignment;
 }
 ```
+```
+type SelfAlignment = 'stretch' | 'center' | 'start' | 'end' | 'auto';
+type ContentAlignment = 'stretch' | 'start' | 'center' | 'end' | 'space-between' | 'space-around' | 'space-evenly';
+type StringOrNumber = string | number;
 
+```
 ### nodeOptions
 
 ```js
