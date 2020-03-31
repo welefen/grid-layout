@@ -55,7 +55,7 @@ export class Container {
       }
       this.config.gridAutoFlow = autoFlow;
     }
-    if (this.config.gridTemplateAreas) {
+    if (typeof this.config.gridTemplateAreas === 'string') {
       const instance = new AreaParser(<string>this.config.gridTemplateAreas);
       const areas = instance.parse();
       this.config.gridTemplateAreas = areas;
