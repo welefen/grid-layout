@@ -16,7 +16,7 @@
     "build": "tsc -d",
     "start": "tsc --watch",
     "test": "nyc ava test/test.js && nyc report --reporter=html",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build && npm test"
   },
   "ava": {
     "compileEnhancements": false,
