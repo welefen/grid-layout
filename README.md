@@ -59,7 +59,7 @@ const result = container.getAllComputedLayout();
   justifyContent?: ContentAlignment;
 }
 ```
-```
+```js
 type SelfAlignment = 'stretch' | 'center' | 'start' | 'end' | 'auto';
 type ContentAlignment = 'stretch' | 'start' | 'center' | 'end' | 'space-between' | 'space-around' | 'space-evenly';
 type StringOrNumber = string | number;
