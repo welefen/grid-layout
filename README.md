@@ -1,2 +1,3 @@
 # grid-layout
-CSS Grid Layout, can use in Canvas/node-canvas
+
+grid-layout is a layout engine which implements grid, can use in canvas/node-canvas
