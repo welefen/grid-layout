@@ -28,6 +28,12 @@ export class Node {
       this.parseGridLine(<GridLineProperty>item);
     });
     this.parseSize();
+    if (!this.config.alignSelf) {
+      this.config.alignSelf = 'auto';
+    }
+    if (!this.config.justifySelf) {
+      this.config.justifySelf = 'auto';
+    }
   }
   private parseGridLine(property: GridLineProperty): void {
     const value = <StringOrNumber>this.config[property];

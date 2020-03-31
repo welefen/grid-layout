@@ -72,6 +72,12 @@ export class Container {
     if (!this.config.alignContent) {
       this.config.alignContent = 'stretch';
     }
+    if (!this.config.alignItems) {
+      this.config.alignItems = 'stretch';
+    }
+    if (!this.config.justifyItems) {
+      this.config.justifyItems = 'stretch';
+    }
   }
   public calculateLayout() {
     this.parse();
