@@ -1,5 +1,10 @@
 # grid-layout
 
+
+<a href="http://badge.fury.io/js/@welefen/grid-layout">
+  <img src="https://img.shields.io/npm/v/@welefen/grid-layout.svg?style=flat-square" alt="NPM version" />
+</a>
+
 grid-layout is a layout engine which implements grid, can use in canvas/node-canvas.
 
 it's support most of features from https://www.w3.org/TR/css-grid-1/#overview-grid except `direction/writing-mode` styles.
