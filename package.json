@@ -1,14 +1,17 @@
 {
-  "name": "grid-layout",
+  "name": "@welefen/grid-layout",
   "version": "1.0.0",
   "description": "CSS Grid Layout, can use in Canvas/node-canvas",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "types": "src/index.d.ts",
   "directories": {
     "test": "test"
   },
   "scripts": {
+    "build": "tsc -d",
     "start": "tsc --watch",
-    "test": "nyc ava test/test.js && nyc report --reporter=html"
+    "test": "nyc ava test/test.js && nyc report --reporter=html",
+    "prepublish": "npm run build"
   },
   "ava": {
     "compileEnhancements": false,
