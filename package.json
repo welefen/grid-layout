@@ -1,13 +1,17 @@
 {
   "name": "@welefen/grid-layout",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "CSS Grid Layout, can use in Canvas/node-canvas",
   "main": "lib/index.js",
   "types": "src/index.d.ts",
   "directories": {
     "test": "test"
   },
-  "keywords": ["grid", "layout", "canvas"],
+  "keywords": [
+    "grid",
+    "layout",
+    "canvas"
+  ],
   "scripts": {
     "build": "tsc -d",
     "start": "tsc --watch",
