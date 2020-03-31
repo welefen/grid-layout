@@ -93,15 +93,14 @@ type StringOrNumber = string | number;
 ```
 // string
 {
-  gridTemplateAreas: 
-                  `"a b c"
-                   "d e f"
-                  `
+  gridTemplateAreas: `"a b c"
+                      "d e f"`
 }
 
 // array
 {
-  gridTemplateAreas: [['a', 'b', 'c'], ['d', 'e', 'f']]
+  gridTemplateAreas: [['a', 'b', 'c'],
+                      ['d', 'e', 'f']]
 }
 ```
 
