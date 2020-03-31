@@ -7,6 +7,7 @@
   "directories": {
     "test": "test"
   },
+  "keywords": ["grid", "layout", "canvas"],
   "scripts": {
     "build": "tsc -d",
     "start": "tsc --watch",
