@@ -8,6 +8,8 @@ import { Composition } from './compute/composition';
 interface ContainerBoundingRect extends BoundingRect {
   children?: BoundingRect[]
 }
+type AlignmentProperty = 'justifyContent' | 'alignContent' | 'alignItems' | 'justifyItems';
+
 
 export class Container {
   children: Node[] = [];
@@ -62,18 +64,12 @@ export class Container {
     }
     this.config.gridRowGap = parseFloat(<string>this.config.gridRowGap) || 0;
     this.config.gridColumnGap = parseFloat(<string>this.config.gridColumnGap) || 0;
-    if (!this.config.justifyContent) {
-      this.config.justifyContent = 'stretch';
-    }
-    if (!this.config.alignContent) {
-      this.config.alignContent = 'stretch';
-    }
-    if (!this.config.alignItems) {
-      this.config.alignItems = 'stretch';
-    }
-    if (!this.config.justifyItems) {
-      this.config.justifyItems = 'stretch';
-    }
+
+    ['justifyContent', 'alignContent', 'alignItems', 'justifyItems'].forEach(item => {
+      if(!this.config[<AlignmentProperty>item]) {
+        this.config[<AlignmentProperty>item] = 'stretch';
+      }
+    })
   }
   public calculateLayout() {
     this.parse();
