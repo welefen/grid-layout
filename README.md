@@ -109,6 +109,8 @@ type StringOrNumber = string | number;
 
 ```sh
 git clone git@github.com:welefen/grid-layout.git;
+npm i;
+npm run build;
 cd web;
 npm i;
 npm start;
