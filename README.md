@@ -6,16 +6,10 @@
     <img src="https://img.shields.io/npm/v/@welefen/grid-layout.svg?style=flat-square" alt="NPM version" />
   </a>
   <a href="https://travis-ci.org/welefen/grid-layout">
-    <img src="https://img.shields.io/travis/welefen/grid-layou.svg?style=flat-square" alt="travis-ci" />
+    <img src="https://img.shields.io/travis/welefen/grid-layout.svg?style=flat-square" alt="travis-ci" />
   </a>
-  <a href="https://coveralls.io/github/welefen/grid-layou">
-    <img src="https://img.shields.io/coveralls/welefen/grid-layou.svg?style=flat-square" alt="Coverage Status" />
-  </a>
-  <a href="https://david-dm.org/welefen/grid-layou">
-    <img src="https://img.shields.io/david/welefen/grid-layou.svg?style=flat-square" alt="Dependency Status" />
-  </a>
-  <a href="http://packagequality.com/#?package=@welefen/grid-layout">
-    <img src="http://npm.packagequality.com/shield/@welefen/grid-layout.svg"/>
+  <a href="https://coveralls.io/github/welefen/grid-layout">
+    <img src="https://img.shields.io/coveralls/welefen/grid-layout.svg?style=flat-square" alt="Coverage Status" />
   </a>
   <a href="https://www.npmjs.com/package/@welefen/grid-layout">
     <img src="https://img.shields.io/npm/dm/@welefen/grid-layout.svg?style=flat-square" />
