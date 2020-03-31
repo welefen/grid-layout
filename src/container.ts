@@ -34,7 +34,7 @@ export class Container {
   private parse() {
     this.parseOrder(this.children);
     ['gridTemplateRows', 'gridTemplateColumns', 'gridAutoRows', 'gridAutoColumns'].forEach(item => {
-      const parser = new TrackParser(<string>this.config[<TrackSizeProperty>item] || '');
+      const parser = new TrackParser(<string>this.config[<TrackSizeProperty>item]);
       parser.parse();
       const type = item.includes('Rows') ? 'row' : 'column';
       const compute = new RepeatTrackCompute(parser.trackList, this, type);

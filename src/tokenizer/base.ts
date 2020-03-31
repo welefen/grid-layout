@@ -6,7 +6,7 @@ export class Tokenizer {
   text: string;
   length: number;
   constructor(text: string) {
-    this.text = text;
+    this.text = text || '';
     this.length = this.text.length;
   }
   isWhitespace(char: string): boolean {
