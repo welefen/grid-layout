@@ -1,14 +1,9 @@
 import { Node } from './node';
-import { ContainerConfig, TrackSizeProperty, GridAutoFlow, BoundingRect } from './util/config';
+import { ContainerConfig, TrackSizeProperty, GridAutoFlow, AlignmentProperty, ContainerBoundingRect } from './util/config';
 import { TrackParser } from './parser/track';
 import { RepeatTrackCompute } from './compute/repeatTrack';
 import { AreaParser } from './parser/area';
 import { Composition } from './compute/composition';
-
-interface ContainerBoundingRect extends BoundingRect {
-  children?: BoundingRect[]
-}
-type AlignmentProperty = 'justifyContent' | 'alignContent' | 'alignItems' | 'justifyItems';
 
 
 export class Container {
@@ -66,7 +61,7 @@ export class Container {
     this.config.gridColumnGap = parseFloat(<string>this.config.gridColumnGap) || 0;
 
     ['justifyContent', 'alignContent', 'alignItems', 'justifyItems'].forEach(item => {
-      if(!this.config[<AlignmentProperty>item]) {
+      if (!this.config[<AlignmentProperty>item]) {
         this.config[<AlignmentProperty>item] = 'stretch';
       }
     })

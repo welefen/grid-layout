@@ -12,6 +12,8 @@ export type MarginProperty = 'margin' | 'marginTop' | 'marginRight' | 'marginBot
 export type BorderPaddingMarginProperty = BorderProperty | PaddingProperty | MarginProperty;
 export type TrackType = 'row' | 'column';
 export type TrackList = TrackItem[];
+export type AlignmentProperty = 'justifyContent' | 'alignContent' | 'alignItems' | 'justifyItems';
+
 
 export interface ContainerConfig {
   gridAutoFlow?: string | GridAutoFlow;
@@ -120,4 +122,17 @@ export interface GridAutoFlow {
 export interface GridPlacement {
   row: { start: number, end: number, size: number };
   column: { start: number, end: number, size: number }
+}
+
+export interface ContainerBoundingRect extends BoundingRect {
+  children?: BoundingRect[]
+}
+
+interface position {
+  row: number;
+  column: number;
+}
+
+export interface AreaNames {
+  [key: string]: position[];
 }
