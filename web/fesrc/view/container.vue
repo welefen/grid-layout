@@ -127,7 +127,8 @@ export default {
       activeIndex: -1,
       gridItems: [],
       absoluteItems: [],
-      absoluteContainerProperties: {}
+      absoluteContainerProperties: {},
+      timer: 0
     }
   },
   mounted() {
@@ -181,20 +182,26 @@ export default {
       })
     },
     getRender() {
-      getRender(this.gridContainerProperties, this.gridItems).then(data => {
-        this.absoluteContainerProperties = {
-          top: data.top,
-          left: data.left,
-          width: data.width,
-          height: data.height
-        }
-        this.absoluteItems = data.children;
-      }).catch((e) => {
-        this.$notify.error({
-          title: '错误',
-          message: e.errmsg
-        });
-      })
+      if(this.timer) {
+        clearTimeout(this.timer);
+        this.timer = 0;
+      }
+      this.timer = setTimeout(() => {
+        getRender(this.gridContainerProperties, this.gridItems).then(data => {
+          this.absoluteContainerProperties = {
+            top: data.top,
+            left: data.left,
+            width: data.width,
+            height: data.height
+          }
+          this.absoluteItems = data.children;
+        }).catch((e) => {
+          this.$notify.error({
+            title: '错误',
+            message: e.errmsg
+          });
+        })
+      }, 50)
     },
     changeStatus() {
       return;
