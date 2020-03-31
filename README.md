@@ -10,8 +10,8 @@
   </a>
   <a href='https://coveralls.io/github/welefen/grid-layout?branch=master'><img src='https://coveralls.io/repos/github/welefen/grid-layout/badge.svg?branch=master' alt='Coverage Status' /></a>
 
-  <a href="https://www.npmjs.com/package/@welefen/grid-layout">
-    <img src="https://img.shields.io/npm/dm/@welefen/grid-layout.svg?style=flat-square" />
+  <!-- <a href="https://www.npmjs.com/package/@welefen/grid-layout">
+    <img src="https://img.shields.io/npm/dm/@welefen/grid-layout.svg?style=flat-square" /> -->
   </a>
 </div>
 
