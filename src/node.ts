@@ -142,34 +142,6 @@ export class Node {
     return this.getLayoutHeight(<number>this.config.maxContentHeight);
   }
 
-  getFitContentWidth(value: number): number {
-    let width = <number>this.config.width;
-    const minWidth = <number>this.config.minWidth;
-    let maxWidth = <number>this.config.maxWidth;
-    width = parseMinMaxValue(width, minWidth, maxWidth);
-    if (width) {
-      value = width;
-    } else if (value > this.config.maxContentWidth) {
-      value = <number>this.config.maxContentWidth;
-    } else if (this.config.minContentWidth > value) {
-      value = <number>this.config.minContentWidth;
-    }
-    return this.getLayoutWidth(value);
-  }
-  getFitContentHeight(value: number): number {
-    let height = <number>this.config.height;
-    const minHeight = <number>this.config.minHeight;
-    let maxHeight = <number>this.config.maxHeight;
-    height = parseMinMaxValue(height, minHeight, maxHeight);
-    if (height) {
-      value = height;
-    } else if (value > this.config.maxContentHeight) {
-      value = <number>this.config.maxContentHeight;
-    } else if (this.config.minContentHeight > value) {
-      value = <number>this.config.minContentHeight;
-    }
-    return this.getLayoutHeight(value);
-  }
   private parseAutoMargin(type: TrackType, boundingRect: BoundingRect): boolean {
     const isRow = type === 'row';
     const marginStart = isRow ? this.config.marginTop : this.config.marginLeft;

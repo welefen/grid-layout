@@ -332,14 +332,24 @@ export class GridCompute {
           pos.end = initSize + 1;
         }
       } else if (end.integer) {
-        pos.end = end.integer - 1;
+        if (end.integer > -1) {
+          pos.end = end.integer - 1;
+        } else {
+          pos.end = track.length + end.integer + 1;
+        }
       }
       // start: span C
       if (start.customIdent) {
         // start: span n1, end: 5
         if (pos.end > -1) {
-          for (let i = pos.end - 1; i > 0; i--) {
-            if (track[i].lineNamesStart.includes(start.customIdent)) {
+          for (let i = pos.end - 1; i >= 0; i--) {
+            let lineNamesStart: string[] = [];
+            if (track[i]) {
+              lineNamesStart = track[i].lineNamesStart;
+            } else if (i > 0 && track[i - 1]) {
+              lineNamesStart = track[i - 1].lineNamesEnd;
+            }
+            if (lineNamesStart.includes(start.customIdent)) {
               pos.start = i;
               break;
             }
@@ -348,78 +358,80 @@ export class GridCompute {
       } else if (start.integer) {
         // start: span 2, end: 4
         // start: span 3, end: 1
-        if (pos.end > -1) {
-          pos.start = Math.max(0, pos.end - start.integer);
-          pos.end = pos.start + start.integer;
-        } else {
+        pos.start = Math.max(0, pos.end - start.integer);
+        pos.end = pos.start + start.integer;
+      }
+    } else {
+      if (start.customIdent) {
+        pos.start = this.findPositionByCustomIdent(track, start, 'start');
+        if (pos.start === -1) {
+          const size = initSize + 1;
+          if (!end.span && end.customIdent) {
+            const index = this.findPositionByCustomIdent(track, end, 'start');
+            if (index > -1) {
+              pos.start = index;
+              pos.end = size;
+            } else {
+              pos.start = size;
+              pos.end = pos.start + 1;
+            }
+            return pos;
+          } else if (!end.span && end.integer) {
+            const integer = end.integer - 1;
+            if (integer > size) {
+              pos.start = size;
+              pos.end = integer;
+            } else {
+              pos.start = integer;
+              pos.end = size === integer ? size + 1 : size;
+            }
+            return pos;
+          }
+        }
+      } else if (start.integer) {
+        pos.start = start.integer - 1;
+      }
+      if (end.span) {
+        if (pos.start === -1) {
           pos.start = 0;
-          pos.end = start.integer;
         }
-      }
-      return pos;
-    }
-    // start: n1
-    if (start.customIdent) {
-      pos.start = this.findPositionByCustomIdent(track, start, 'start');
-      if (pos.start === -1) {
-        const size = initSize + 1;
-        if (!end.span && end.customIdent) {
-          const index = this.findPositionByCustomIdent(track, end, 'start');
-          if (index > -1) {
-            pos.start = index;
-            pos.end = size;
-          } else {
-            pos.start = size;
-            pos.end = pos.start + 1;
+        if (end.customIdent) {
+          for (let i = pos.start; i < track.length; i++) {
+            if (track[i].lineNamesEnd.includes(end.customIdent)) {
+              pos.end = i + 1;
+              break;
+            }
           }
-          return pos;
-        } else if (!end.span && end.integer) {
-          const integer = end.integer - 1;
-          if (integer > size) {
-            pos.start = size;
-            pos.end = integer;
-          } else {
-            pos.start = integer;
-            pos.end = size === integer ? size + 1 : size;
+          if (pos.end === -1) {
+            pos.end = initSize + 1;
           }
-          return pos;
+        } else if (end.integer) {
+          pos.end = pos.start + end.integer;
         }
-      }
-    } else if (start.integer) {
-      pos.start = start.integer - 1;
-    }
-    if (end.span) {
-      if (pos.start === -1) {
-        pos.start = 0;
-      }
-      if (end.customIdent) {
-        for (let i = pos.start; i < track.length; i++) {
-          if (track[i].lineNamesEnd.includes(end.customIdent)) {
-            pos.end = i;
-            break;
+      } else if (end.customIdent) {
+        pos.end = this.findPositionByCustomIdent(track, end, 'end');
+        if (pos.end === -1) {
+          if (!start.span && start.customIdent) {
+            const index = this.findPositionByCustomIdent(track, end, 'start');
+            if (index === -1) {
+              pos.end = initSize + 1;
+            } else if (index < pos.start) {
+              pos.end = pos.start;
+              pos.start = index;
+            }
+          } else if (!start.span && !start.customIdent && !start.integer) {
+            pos.end = initSize + 1;
           }
         }
       } else if (end.integer) {
-        pos.end = pos.start + end.integer;
-      }
-    } else if (end.customIdent) {
-      pos.end = this.findPositionByCustomIdent(track, end, 'end');
-      if (pos.end === -1) {
-        if (!start.span && start.customIdent) {
-          const index = this.findPositionByCustomIdent(track, end, 'start');
-          if (index === -1) {
-            pos.end = initSize + 1;
-          } else if (index < pos.start) {
-            pos.end = pos.start;
-            pos.start = index;
-          }
-        } else if (!start.span && !start.customIdent && !start.integer) {
-          pos.end = initSize + 1;
+        if (end.integer < 0) {
+          pos.end = track.length + end.integer + 1;
+        } else {
+          pos.end = end.integer - 1;
         }
       }
-    } else if (end.integer) {
-      pos.end = end.integer - 1;
     }
+
     if (pos.start > -1 && pos.end === -1) {
       pos.end = pos.start + 1;
     } else if (pos.end > -1 && pos.start === -1) {
