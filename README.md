@@ -13,7 +13,7 @@ npm i @welefen/grid-layout
 ## How to use
 
 ```js
-import {Container, Node} from '@welefen/grid-layout';
+import { Container, Node } from '@welefen/grid-layout';
 const container = new Container(containerOptions);
 nodes.forEach(nodeOptions => {
   const node = new Node(nodeOptions);
@@ -105,6 +105,12 @@ type StringOrNumber = string | number;
   maxContentHeight?: StringOrNumber;
 }
 ```
+## Playground
 
-## Playgroud
-
+```sh
+git clone git@github.com:welefen/grid-layout.git;
+cd web;
+npm i;
+npm start;
+# then visit http://127.0.0.1:8360/
+```
