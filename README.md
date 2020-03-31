@@ -81,6 +81,25 @@ type ContentAlignment = 'stretch' | 'start' | 'center' | 'end' | 'space-between'
 type StringOrNumber = string | number;
 
 ```
+
+### gridTemplateAreas config
+
+```
+// string
+{
+  gridTemplateAreas: 
+                  `"a b c"
+                   "d e f"
+                  `
+}
+
+// array
+{
+  gridTemplateAreas: [['a', 'b', 'c'], ['d', 'e', 'f']]
+}
+```
+
+
 ### nodeOptions
 
 ```js
