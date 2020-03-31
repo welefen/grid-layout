@@ -81,8 +81,13 @@ export class Node {
     if (this.config.minHeight > this.config.maxHeight) {
       this.config.maxHeight = 0;
     }
-    this.boundingRect.width = this.getComputedWidth(this.config.minContentWidth);
-    this.boundingRect.height = this.getComputedHeight(this.config.minContentHeight);
+    this.config.minContentWidth = parseNumberValue(this.config.minContentWidth, pWidth);
+    this.config.maxContentWidth = parseNumberValue(this.config.maxContentWidth, pWidth);
+    this.config.minContentHeight = parseNumberValue(this.config.minContentHeight, pHeight);
+    this.config.maxContentHeight = parseNumberValue(this.config.maxContentHeight, pHeight);
+
+    this.boundingRect.width = this.getComputedWidth(<number>this.config.minContentWidth);
+    this.boundingRect.height = this.getComputedHeight(<number>this.config.minContentHeight);
   }
   private getComputedWidth(width: number = 0): number {
     width = <number>this.config.width || width || 0;
@@ -125,16 +130,16 @@ export class Node {
     return height;
   }
   get minContentWidth() {
-    return this.getLayoutWidth(this.config.minContentWidth);
+    return this.getLayoutWidth(<number>this.config.minContentWidth);
   }
   get maxContentWidth() {
-    return this.getLayoutWidth(this.config.maxContentWidth);
+    return this.getLayoutWidth(<number>this.config.maxContentWidth);
   }
   get minContentHeight() {
-    return this.getLayoutHeight(this.config.minContentHeight);
+    return this.getLayoutHeight(<number>this.config.minContentHeight);
   }
   get maxContentHeight() {
-    return this.getLayoutHeight(this.config.maxContentHeight);
+    return this.getLayoutHeight(<number>this.config.maxContentHeight);
   }
 
   getFitContentWidth(value: number): number {
@@ -145,9 +150,9 @@ export class Node {
     if (width) {
       value = width;
     } else if (value > this.config.maxContentWidth) {
-      value = this.config.maxContentWidth;
+      value = <number>this.config.maxContentWidth;
     } else if (this.config.minContentWidth > value) {
-      value = this.config.minContentWidth;
+      value = <number>this.config.minContentWidth;
     }
     return this.getLayoutWidth(value);
   }
@@ -159,9 +164,9 @@ export class Node {
     if (height) {
       value = height;
     } else if (value > this.config.maxContentHeight) {
-      value = this.config.maxContentHeight;
+      value = <number>this.config.maxContentHeight;
     } else if (this.config.minContentHeight > value) {
-      value = this.config.minContentHeight;
+      value = <number>this.config.minContentHeight;
     }
     return this.getLayoutHeight(value);
   }

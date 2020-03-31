@@ -61,10 +61,10 @@ export interface NodeConfig {
   maxWidth?: StringOrNumber;
   minHeight?: StringOrNumber;
   maxHeight?: StringOrNumber;
-  minContentWidth?: number;
-  minContentHeight?: number;
-  maxContentWidth?: number;
-  maxContentHeight?: number;
+  minContentWidth?: StringOrNumber;
+  minContentHeight?: StringOrNumber;
+  maxContentWidth?: StringOrNumber;
+  maxContentHeight?: StringOrNumber;
 }
 
 export interface TrackItem {

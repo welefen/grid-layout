@@ -127,11 +127,17 @@
         <el-form-item label="min-width">
           <el-input v-model="gridItem.minWidth" type="text" @change="changeProperty('minWidth', $event)"></el-input>
         </el-form-item>
-        <el-form-item label="min-content">
-          <el-input v-model="gridItem.minContent" type="text" @change="changeProperty('minContent', $event)"></el-input>
+        <el-form-item label="min-content-width">
+          <el-input v-model="gridItem.minContentWidth" type="text" @change="changeProperty('minContentWidth', $event)"></el-input>
         </el-form-item>
-        <el-form-item label="max-content">
-          <el-input v-model="gridItem.maxContent" type="text" @change="changeProperty('maxContent', $event)"></el-input>
+        <el-form-item label="max-content-width">
+          <el-input v-model="gridItem.maxContentWidth" type="text" @change="changeProperty('maxContentWidth', $event)"></el-input>
+        </el-form-item>
+        <el-form-item label="min-content-height">
+          <el-input v-model="gridItem.minContentHeight" type="text" @change="changeProperty('minContentHeight', $event)"></el-input>
+        </el-form-item>
+        <el-form-item label="max-content-height">
+          <el-input v-model="gridItem.maxContentHeight" type="text" @change="changeProperty('maxContentHeight', $event)"></el-input>
         </el-form-item>
         <el-form-item label="max-width">
           <el-input v-model="gridItem.maxWidth" type="text" @change="changeProperty('maxWidth', $event)"></el-input>
@@ -243,8 +249,10 @@ const gridItem = {
   gridArea: '',
   width: 100,
   minWidth: '',
-  minContent: '',
-  maxContent: '',
+  minContentWidth: '',
+  maxContentWidth: '',
+  minContentHeight: '',
+  maxContentHeight: '',
   maxWidth: '',
   height: 100,
   minHeight: '',
