@@ -5,7 +5,6 @@ import { RepeatTrackCompute } from './compute/repeatTrack';
 import { AreaParser } from './parser/area';
 import { Composition } from './compute/composition';
 
-
 export class Container {
   children: Node[] = [];
   config: ContainerConfig;
