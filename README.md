@@ -20,13 +20,13 @@ grid-layout is a layout engine which implements grid, can use in canvas/node-can
 
 it's support most of features from https://www.w3.org/TR/css-grid-1/ except `direction/writing-mode` styles.
 
-## install
+## Install
 
 ```
 npm i @welefen/grid-layout
 ```
 
-## How to use
+## Usage
 
 ```js
 import { Container, Node } from '@welefen/grid-layout';
