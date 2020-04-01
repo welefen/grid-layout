@@ -2,10 +2,6 @@ import { deepmerge } from '../util/util';
 import { GridCell, TrackList, GridLine, GridAutoFlow, TrackType, TrackItem, AreaNames } from '../util/config';
 import { Node } from '../node';
 import { Container } from '../container';
-
-
-
-
 export class GridCompute {
   cells: GridCell[][] = [];
   areaNames: AreaNames = {};
