@@ -109,10 +109,18 @@ export class GridCompute {
           this.areaNames[name] = [];
         }
         this.areaNames[name].push({ row, column });
-        this.rowTrack[row].lineNamesStart.push(`${name}-start`);
-        this.rowTrack[row].lineNamesEnd.push(`${name}-end`);
-        this.columnTrack[column].lineNamesStart.push(`${name}-start`);
-        this.columnTrack[column].lineNamesEnd.push(`${name}-end`);
+        if (!row || areas[row - 1][column] !== name) {
+          this.rowTrack[row].lineNamesStart.push(`${name}-start`);
+        }
+        if (!column || areas[row][column - 1] !== name) {
+          this.columnTrack[column].lineNamesStart.push(`${name}-start`);
+        }
+        if (row === areas.length - 1 || areas[row + 1][column] !== name) {
+          this.rowTrack[row].lineNamesEnd.push(`${name}-end`);
+        }
+        if (column === areas[row].length - 1 || areas[row][column + 1] !== name) {
+          this.columnTrack[column].lineNamesEnd.push(`${name}-end`);
+        }
       })
     })
   }
