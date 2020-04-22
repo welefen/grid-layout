@@ -3,7 +3,7 @@
   "version": "1.0.5",
   "description": "CSS Grid Layout, can use in Canvas/node-canvas",
   "main": "lib/index.js",
-  "types": "src/index.d.ts",
+  "types": "lib/index.d.ts",
   "directories": {
     "test": "test"
   },

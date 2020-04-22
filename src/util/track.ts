@@ -5,11 +5,11 @@ export function isFixedBreadth(value: TrackItem): boolean {
 }
 
 export function isInflexibleBreadth(value: TrackItem): boolean {
-  return this.isFixedBreadth(value) || ['min-content', 'max-content', 'auto'].includes(value.type);
+  return isFixedBreadth(value) || ['min-content', 'max-content', 'auto'].includes(value.type);
 }
 
 export function isTrackBreadth(value: TrackItem): boolean {
-  return this.isInflexibleBreadth(value) || value.type === 'fr';
+  return isInflexibleBreadth(value) || value.type === 'fr';
 }
 
 export function isAutoRepeat(value: TrackItem): boolean {
