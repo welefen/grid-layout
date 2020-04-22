@@ -109,20 +109,36 @@ export class GridCompute {
           this.areaNames[name] = [];
         }
         this.areaNames[name].push({ row, column });
-        if (!row || areas[row - 1][column] !== name) {
-          this.rowTrack[row].lineNamesStart.push(`${name}-start`);
+        const startName = `${name}-start`;
+        const endName = `${name}-end`;
+        if (!row) {
+          this.rowTrack[row].lineNamesStart.push(startName);
+        } else if (areas[row - 1][column] !== name) {
+          this.rowTrack[row].lineNamesStart.push(startName);
+          this.rowTrack[row - 1].lineNamesEnd.push(startName);
         }
-        if (!column || areas[row][column - 1] !== name) {
-          this.columnTrack[column].lineNamesStart.push(`${name}-start`);
+        if (row === areas.length - 1) {
+          this.rowTrack[row].lineNamesEnd.push(endName);
+        } else if (areas[row + 1][column] !== name) {
+          this.rowTrack[row].lineNamesEnd.push(endName);
+          this.rowTrack[row + 1].lineNamesStart.push(endName);
         }
-        if (row === areas.length - 1 || areas[row + 1][column] !== name) {
-          this.rowTrack[row].lineNamesEnd.push(`${name}-end`);
+
+        if (!column) {
+          this.columnTrack[column].lineNamesStart.push(startName);
+        } else if (areas[row][column - 1] !== name) {
+          this.columnTrack[column].lineNamesStart.push(startName);
+          this.columnTrack[column - 1].lineNamesEnd.push(startName);
         }
-        if (column === areas[row].length - 1 || areas[row][column + 1] !== name) {
-          this.columnTrack[column].lineNamesEnd.push(`${name}-end`);
+        if (column === areas[row].length - 1) {
+          this.columnTrack[column].lineNamesEnd.push(endName);
+        } else if (areas[row][column + 1] !== name) {
+          this.columnTrack[column].lineNamesEnd.push(endName);
+          this.columnTrack[column + 1].lineNamesStart.push(endName);
         }
       })
     })
+    console.log(this.columnTrack)
   }
 
   public putNodes(nodes: Node[]) {
