@@ -26,6 +26,9 @@ export class TrackParser extends Parser {
     const match = value.match(lenReg);
     if (match) {
       const val = parseFloat(match[1]);
+      if (val < 0) {
+        throw new Error(`${value} must be positive`);
+      }
       if (!match[2] || match[2] === 'px') {
         return { value: val, type: 'px', baseSize: val, growthLimit: val };
       }
