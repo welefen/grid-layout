@@ -138,7 +138,6 @@ export class GridCompute {
         }
       })
     })
-    console.log(this.columnTrack)
   }
 
   public putNodes(nodes: Node[]) {
