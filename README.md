@@ -31,7 +31,7 @@ npm i @welefen/grid-layout
 ```html
 <script src="https://unpkg.com/@welefen/grid-layout/dist/gridLayout.js"></script>
 <script>
-const {Container, Node} = GridLayout;
+const { Container, Node } = GridLayout;
 </script>
 ```
 
