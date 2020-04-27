@@ -1,15 +1,15 @@
 <template>
 <div style="display:flex;flex-direction:column;height:100vh" @click="changeStatus">
   <div style="padding:20px;background:#fff;">
-    <el-button type="primary" @click="addgridItem">添加元素</el-button>
-    <el-button type="danger" :disabled="canDisabled" @click="deletegridItem">删除元素</el-button>
-    <el-button v-if="showBtn" type="success" @click="addTestCase">添加到测试用例</el-button>
+    <el-button type="primary" @click="addgridItem">Add Node</el-button>
+    <el-button type="danger" :disabled="canDisabled" @click="deletegridItem">Delete Node</el-button>
+    <el-button v-if="showBtn" type="success" @click="addTestCase">Add TestCase</el-button>
 
 
     <el-dropdown v-if="showBtn" @command="openFailItem" style="margin-left:10px;">
       <el-badge :value="failNums" class="item">
         <el-button type="primary">
-          单元测试（{{successNums}}）<i class="el-icon-arrow-down el-icon--right"></i>
+          TestCases（{{successNums}}）<i class="el-icon-arrow-down el-icon--right"></i>
         </el-button>
       </el-badge>
       <el-dropdown-menu slot="dropdown">
@@ -140,11 +140,13 @@ export default {
       event.$emit('getgridStyle', 'item');
     });
     this.activeIndex = -1;
-    getAllTest().then(data => {
-      this.successNums = data.success;
-      this.failNums = data.fail.length;
-      this.failList = data.fail;
-    })
+    if(this.showBtn) {
+      getAllTest().then(data => {
+        this.successNums = data.success;
+        this.failNums = data.fail.length;
+        this.failList = data.fail;
+      })
+    }
   },
   computed: {
     canDisabled() {
@@ -187,7 +189,7 @@ export default {
         this.timer = 0;
       }
       this.timer = setTimeout(() => {
-        getRender(this.gridContainerProperties, this.gridItems).then(data => {
+        Promise.resolve(getRender(this.gridContainerProperties, this.gridItems, this.showBtn)).then(data => {
           this.absoluteContainerProperties = {
             top: data.top,
             left: data.left,

@@ -157,4 +157,4 @@ npm start;
 # then visit http://127.0.0.1:8080/
 ```
 
-online playground: http://grid.welefen.com/
+online playground: https://welefen.com/lab/gridLayout/

@@ -214,7 +214,7 @@
       </div>
       
        <div v-if="type === ''" style="padding: 20px;color:#ccc;font-size: 18px;">
-         选中右侧一个元素后进行编辑
+         select element & edit
        </div>
     </el-form>
   </div>
