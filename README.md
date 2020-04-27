@@ -28,6 +28,13 @@ npm i @welefen/grid-layout
 
 ## Usage
 
+```html
+<script src="https://unpkg.com/@welefen/grid-layout/dist/gridLayout.js"></script>
+<script>
+const {Container, Node} = GridLayout;
+</script>
+```
+
 ```js
 import { Container, Node } from '@welefen/grid-layout';
 const container = new Container({ // containerOptions
