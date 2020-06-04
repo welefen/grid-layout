@@ -57,7 +57,13 @@ export class Container {
       this.config.gridTemplateAreas = areas;
     }
     this.config.gridRowGap = parseFloat(<string>this.config.gridRowGap) || 0;
+    if (this.config.gridRowGap < 0) {
+      throw new Error('gridRowGap: negative values are invalid');
+    }
     this.config.gridColumnGap = parseFloat(<string>this.config.gridColumnGap) || 0;
+    if (this.config.gridColumnGap < 0) {
+      throw new Error('gridColumnGap: negative values are invalid');
+    }
 
     ['justifyContent', 'alignContent', 'alignItems', 'justifyItems'].forEach(item => {
       if (!this.config[<AlignmentProperty>item]) {
